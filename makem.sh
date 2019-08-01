@@ -449,6 +449,12 @@ debug "Remaining args: ${rest[@]}"
 
 trap cleanup EXIT INT TERM
 
+if ! [[ ${project_lisp_non_test_files[@]} ]]
+then
+    error "No files specified and not in a git repo."
+    exit 1
+fi
+
 for rule in "${rest[@]}"
 do
     if type "$rule" 2>/dev/null | grep "$rule is a function" &>/dev/null
