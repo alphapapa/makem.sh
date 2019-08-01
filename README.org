@@ -29,40 +29,35 @@ Copy =makem.sh= into your package's root directory.
 :TOC:      0
 :END:
 
-** Rules
+#+BEGIN_EXAMPLE
+makem.sh [OPTIONS] RULES...
 
-Similar to a Makefile, =makem.sh= has several rules which can be run:
+Rules:
+  all      Run all lints and tests.
+  compile  Byte-compile source files.
 
-+  =all= :: Run all lints and all tests.
-+  =compile= :: Byte-compile source files.
+  lint           Run all lints.
+  lint-checkdoc  Run checkdoc.
+  lint-compile   Byte-compile source files with warnings as errors.
+  lint-package   Run package-lint.
 
-*Linting*
+  test, tests     Run all tests.
+  test-buttercup  Run Buttercup tests.
+  test-ert        Run ERT tests.
 
-Lints are run on non-test source files.
+Options
+  -d, --debug    Print debug info.
+  -h, --help     I need somebody!
+  -v, --verbose  Increase verbosity.  May be given up to 2 times.
 
-+  =lint= :: Run all lints.
-+  =lint-checkdoc= :: Run =checkdoc=.
-+  =lint-compile= :: Byte-compile source files, signaling warning as errors.
-+  =lint-package= :: Run =package-lint=.
+  -f FILE, --file FILE  Check FILE in addition to discovered files.
 
-*Testing*
+  --no-color        Disable color output.
+  -C, --no-compile  Don't compile files automatically.
 
-ERT and Buttercup tests are discovered automatically.  Source files are byte-compiled before testing by default.
-
-+  =test=, =tests= :: Run all tests.
-+  =test-buttercup= :: Run Buttercup tests.
-+  =test-ert= :: Run ERT tests.
-
-** Options
-
-  +  =-d=, =--debug= :: Print debug info.
-  +  =-h=, =--help= :: I need somebody!
-  +  =-v=, =--verbose= :: Increase verbosity.  May be given up to 2 times.
-
-  +  =-f FILE=, =--file FILE= :: Check FILE in addition to discovered files.
-
-  +  =--no-color= :: Disable color output.
-  +  =-C=, =--no-compile= ::  Don't compile files automatically.
+Source files are automatically discovered from git, or may be
+specified with options.
+#+END_EXAMPLE
 
 * Changelog
 :PROPERTIES:
