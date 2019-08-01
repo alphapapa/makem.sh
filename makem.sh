@@ -422,8 +422,8 @@ do
             ;;
         -f|--file)
             shift
-            project_lisp_non_test_files=("$1")
-            project_byte_compile_files=("$1")
+            project_lisp_non_test_files+=("$1")
+            project_byte_compile_files+=("$1")
             ;;
         --no-color)
             unset color
