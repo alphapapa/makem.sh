@@ -148,7 +148,7 @@ function project-elisp-files {
     git ls-files 2>/dev/null | egrep "\.el$" | exclude-files
 }
 
-function project-elisp-files-non-test {
+function project-source-files {
     # Echo list of Elisp files that are not tests.
     project-test-files invert
 }
@@ -317,7 +317,7 @@ function lint-checkdoc {
 
     run_emacs \
         --load=$checkdoc_file \
-        "${project_lisp_non_test_files[@]}" \
+        "${project_source_files[@]}" \
         && success "Linting checkdoc finished without errors." \
             || error "Linting checkdoc failed."
 }
@@ -338,7 +338,7 @@ function lint-package {
     run_emacs \
         --eval "(require 'package-lint)" \
         --funcall package-lint-batch-and-exit \
-        "${project_lisp_non_test_files[@]}" \
+        "${project_source_files[@]}" \
         && success "Linting package finished without errors." \
             || error "Linting package failed."
 }
@@ -383,7 +383,7 @@ compile=true
 load_path="."
 
 project_byte_compile_files=($(project-elisp-files))
-project_lisp_non_test_files=($(project-elisp-files-non-test))
+project_source_files=($(project-source-files))
 project_test_files=($(project-test-files))
 
 package_initialize_file=$(elisp-package-initialize-file)
@@ -422,7 +422,7 @@ do
             ;;
         -f|--file)
             shift
-            project_lisp_non_test_files+=("$1")
+            project_source_files+=("$1")
             project_byte_compile_files+=("$1")
             ;;
         --no-color)
@@ -449,7 +449,7 @@ debug "Remaining args: ${rest[@]}"
 
 trap cleanup EXIT INT TERM
 
-if ! [[ ${project_lisp_non_test_files[@]} ]]
+if ! [[ ${project_source_files[@]} ]]
 then
     error "No files specified and not in a git repo."
     exit 1
