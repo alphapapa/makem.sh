@@ -145,7 +145,7 @@ function batch-byte-compile {
 
 function project-elisp-files {
     # Echo list of Elisp files in project.
-    git ls-files | egrep "\.el$" | exclude-files
+    git ls-files 2>/dev/null | egrep "\.el$" | exclude-files
 }
 
 function project-elisp-files-non-test {
@@ -317,7 +317,7 @@ function lint-checkdoc {
 
     run_emacs \
         --load=$checkdoc_file \
-        $(project-elisp-files-non-test) \
+        "${project_lisp_non_test_files[@]}" \
         && success "Linting checkdoc finished without errors." \
             || error "Linting checkdoc failed."
 }
@@ -338,7 +338,7 @@ function lint-package {
     run_emacs \
         --eval "(require 'package-lint)" \
         --funcall package-lint-batch-and-exit \
-        $(project-elisp-files-non-test | files_args) \
+        "${project_lisp_non_test_files[@]}" \
         && success "Linting package finished without errors." \
             || error "Linting package failed."
 }
@@ -383,6 +383,7 @@ compile=true
 load_path="."
 
 project_byte_compile_files=($(project-elisp-files))
+project_lisp_non_test_files=($(project-elisp-files-non-test))
 project_test_files=($(project-test-files))
 
 package_initialize_file=$(elisp-package-initialize-file)
@@ -402,7 +403,7 @@ COLOR_white='\e[0;37m'
 
 # * Args
 
-args=$(getopt -n "$0" -o dhvC -l debug,help,verbose,no-color,no-compile -- "$@") || { usage; exit 1; }
+args=$(getopt -n "$0" -o dhvf:C -l debug,help,verbose,file:,no-color,no-compile -- "$@") || { usage; exit 1; }
 eval set -- "$args"
 
 while true
@@ -418,6 +419,11 @@ do
             ;;
         -v|--verbose)
             ((verbose++))
+            ;;
+        -f|--file)
+            shift
+            project_lisp_non_test_files=("$1")
+            project_byte_compile_files=("$1")
             ;;
         --no-color)
             unset color
