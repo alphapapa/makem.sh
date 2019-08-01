@@ -124,7 +124,7 @@ function run_emacs {
 
     exit=$?
     [[ $exit != 0 ]] && debug "Emacs exited non-zero: $exit"
-    if [[ $verbose || $exit != 0 ]]
+    if [[ $verbose -gt 1 || $exit != 0 ]]
     then
         cat $output_file
     fi
@@ -232,16 +232,11 @@ function log {
     echo -e "LOG ($(date "+%Y-%m-%d %H:%M:%S")): $@" >&2
 }
 function verbose {
-    if [[ $verbose ]]
+    # $1 is the verbosity level, rest are echoed when appropriate.
+    if [[ $verbose -ge $1 ]]
     then
-        function verbose {
-            log "$@"
-        }
-        verbose "$@"
-    else
-        function verbose {
-            true
-        }
+        shift
+        log "$@"
     fi
 }
 
@@ -262,28 +257,28 @@ EOF
 # These functions are intended to be called as rules, like a Makefile.
 
 function all {
-    verbose "Running all rules..."
+    verbose 1 "Running all rules..."
 
     lint
     tests
 }
 
 function compile {
-    verbose "Compiling..."
+    verbose 1 "Compiling..."
 
     batch-byte-compile "${project_byte_compile_files[@]}" \
         || error "Byte-compilation failed."
 }
 
 function lint {
-    verbose "Linting..."
+    verbose 1 "Linting..."
 
     lint-checkdoc
     lint-package
 }
 
 function lint-checkdoc {
-    verbose "Linting checkdoc..."
+    verbose 1 "Linting checkdoc..."
 
     local checkdoc_file=$(elisp-checkdoc-file)
     temp_paths+=($checkdoc_file)
@@ -295,7 +290,7 @@ function lint-checkdoc {
 }
 
 function lint-package {
-    verbose "Linting package..."
+    verbose 1 "Linting package..."
 
     run_emacs \
         --eval "(require 'package-lint)" \
@@ -311,9 +306,9 @@ function tests {
 }
 
 function test-buttercup {
-    verbose "Running Buttercup tests..."
+    verbose 1 "Running Buttercup tests..."
 
-    verbose "Buttercup support not yet implemented."
+    verbose 1 "Buttercup support not yet implemented."
 }
 
 function test-ert {
@@ -324,7 +319,7 @@ function test-ert {
 
     [[ $compile ]] && compile
 
-    verbose "Running ERT tests..."
+    verbose 1 "Running ERT tests..."
 
     run_emacs \
         $(load_files_args "${project_test_files[@]}") \
@@ -335,6 +330,7 @@ function test-ert {
 # * Defaults
 
 errors=0
+verbose=0
 
 compile=true
 load_path="."
@@ -355,13 +351,14 @@ do
     case "$1" in
         -d|--debug)
             debug=true
+            verbose=2
             ;;
         -h|--help)
             usage
             exit
             ;;
         -v|--verbose)
-            verbose=true
+            ((verbose++))
             ;;
         -C|--no-compile)
             unset compile
@@ -404,7 +401,7 @@ then
     log "Finished with $errors errors."
 elif [[ $verbose ]]
 then
-    verbose "Finished with $errors errors."
+    verbose 1 "Finished with $errors errors."
 fi
 
 exit $errors
