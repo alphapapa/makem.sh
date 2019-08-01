@@ -355,6 +355,7 @@ function test-ert {
 
 # * Defaults
 
+# TODO: Disable color if not outputting to a terminal.
 color=true
 errors=0
 verbose=0
