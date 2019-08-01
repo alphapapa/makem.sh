@@ -74,10 +74,22 @@ package_initialize=" (progn
 function run_emacs {
     debug "Running: emacs -Q --batch -L \"$load_path\" --eval \"$package_initialize\" $@"
 
+    output_file=$(mktemp)
+
     emacs -Q --batch \
           -L "$load_path" \
           --eval "$package_initialize" \
-          "$@"
+          "$@" >$output_file 2>&1
+
+    exit=$?
+    [[ $exit -gt 0 ]] && error "Emacs exited non-zero: $exit"
+    if [[ $verbose || $exit != 0 ]]
+    then
+        cat $output_file
+    fi
+    rm -f $output_file
+
+    return $exit
 }
 
 # ** Compilation
@@ -205,7 +217,7 @@ test_files=($(test_files))
 
 # * Args
 
-args=$(getopt -n "$0" -o dhC -l debug,help,no-compile -- "$@") || { usage; exit 1; }
+args=$(getopt -n "$0" -o dhvC -l debug,help,verbose,no-compile -- "$@") || { usage; exit 1; }
 eval set -- "$args"
 
 while true
@@ -217,6 +229,9 @@ do
         -h|--help)
             usage
             exit
+            ;;
+        -v|--verbose)
+            verbose=true
             ;;
         -C|--no-compile)
             unset compile
