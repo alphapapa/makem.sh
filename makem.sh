@@ -82,7 +82,6 @@ function run_emacs {
 # ** Compilation
 
 function batch-byte-compile {
-    # Byte-compile $byte_compile_files.
     debug "batch-byte-compile: $@"
 
     run_emacs \
