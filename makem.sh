@@ -188,16 +188,12 @@ function project-elisp-files {
 
 function project-source-files {
     # Echo list of Elisp files that are not tests.
-    project-test-files invert
+    project-elisp-files | exclude-files
 }
 
 function project-test-files {
-    # Echo list of Elisp test files (files in test and/or tests
-    # subdirs).  If $1 is non-empty, return non-test files.
-    local invert
-    [[ $1 ]] && invert="-v"
-
-    project-elisp-files | exclude-files | egrep $invert '^tests?/'
+    # Echo list of Elisp test files (files in test and/or tests subdirs that start with "test").
+    project-elisp-files | exclude-files | egrep '^tests?/test-?'
 }
 
 function exclude-files {
