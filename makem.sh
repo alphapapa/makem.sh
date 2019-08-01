@@ -321,7 +321,7 @@ Rules:
   test-buttercup  Run Buttercup tests.
   test-ert        Run ERT tests.
 
-Options
+Options:
   -d, --debug    Print debug info.
   -h, --help     I need somebody!
   -v, --verbose  Increase verbosity, up to -vv.
