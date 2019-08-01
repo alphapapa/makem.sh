@@ -61,6 +61,24 @@
 # These functions return a path to an elisp file which can be loaded
 # by Emacs on the command line with -l or --load.
 
+function elisp-buttercup-file {
+    # The function buttercup-run, which is called by buttercup-run-discover,
+    # signals an error if it can't find any Buttercup test suites.  We don't
+    # want that to be an error, so we define advice which ignores that error.
+    local file=$(mktemp)
+    cat >$file <<EOF
+(defun makem-buttercup-run (oldfun &rest r)
+  "Call buttercup-run, ignoring \"No suites defined\" error."
+  (condition-case err
+      (apply oldfun r)
+    (error (unless (string= "No suites defined" (error-message-string err))
+             (signal (car err) (cdr err))))))
+
+(advice-add #'buttercup-run :around #'makem-buttercup-run)
+EOF
+    echo $file
+}
+
 function elisp-checkdoc-file {
     # Since checkdoc doesn't have a batch function that exits non-zero
     # when errors are found, we make one.
@@ -352,7 +370,15 @@ function tests {
 function test-buttercup {
     verbose 1 "Running Buttercup tests..."
 
-    verbose 1 "Buttercup support not yet implemented."
+    local buttercup_file=$(elisp-buttercup-file)
+    temp_paths+=($buttercup_file)
+
+    run_emacs \
+        --load buttercup \
+        --load $buttercup_file \
+        -f buttercup-run-discover \
+        && success "Buttercup tests finished without errors." \
+            || error "Buttercup tests failed."
 }
 
 function test-ert {
