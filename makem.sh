@@ -212,7 +212,7 @@ function load_files_args {
     # file, even though running the command manually like that works.
     for file in "$@"
     do
-        printf -- '--load=%s' "$file"
+        printf -- '--load=%s ' "$file"
     done
 }
 
