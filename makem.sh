@@ -247,6 +247,12 @@ function log_color {
     shift
     echo_color $color "LOG ($(ts)): $@" >&2
 }
+function success {
+    if [[ $verbose -ge 2 ]]
+    then
+        log_color green "$@" >&2
+    fi
+}
 function verbose {
     # $1 is the verbosity level, rest are echoed when appropriate.
     if [[ $verbose -ge $1 ]]
@@ -291,7 +297,8 @@ function compile {
     verbose 1 "Compiling..."
 
     batch-byte-compile "${project_byte_compile_files[@]}" \
-        || error "Byte-compilation failed."
+        && success "Byte-compilation finished without errors." \
+            || error "Byte-compilation failed."
 }
 
 function lint {
@@ -310,7 +317,8 @@ function lint-checkdoc {
     run_emacs \
         --load=$checkdoc_file \
         $(project-elisp-files-non-test) \
-        || error "Checkdoc linting failed."
+        && success "Checkdoc linting finished without errors." \
+            || error "Checkdoc linting failed."
 }
 
 function lint-package {
@@ -320,7 +328,8 @@ function lint-package {
         --eval "(require 'package-lint)" \
         --funcall package-lint-batch-and-exit \
         $(project-elisp-files-non-test | files_args) \
-        || error "Package linting failed."
+        && success "Package linting finished without errors." \
+            || error "Package linting failed."
 }
 
 function tests {
@@ -348,7 +357,8 @@ function test-ert {
     run_emacs \
         $(load_files_args "${project_test_files[@]}") \
         -f ert-run-tests-batch-and-exit \
-        || error "ERT tests failed."
+        && success "ERT tests finished without errors." \
+            || error "ERT tests failed."
 }
 
 # * Defaults
@@ -440,9 +450,8 @@ done
 if [[ $errors -gt 0 ]]
 then
     log_color red "Finished with $errors errors."
-elif [[ $verbose ]]
-then
-    verbose 1 "Finished with $errors errors."
+else
+    success "Finished without errors."
 fi
 
 exit $errors
