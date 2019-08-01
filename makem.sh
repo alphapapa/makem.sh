@@ -379,15 +379,15 @@ temp_paths+=($package_initialize_file)
 
 # ** Colors
 
-COLOR_off='\e[0m'       # Text Reset
-COLOR_black='\e[0;30m'        # Black
-COLOR_red='\e[0;31m'          # Red
-COLOR_green='\e[0;32m'        # Green
-COLOR_yellow='\e[0;33m'       # Yellow
-COLOR_blue='\e[0;34m'         # Blue
-COLOR_purple='\e[0;35m'       # Purple
-COLOR_cyan='\e[0;36m'         # Cyan
-COLOR_white='\e[0;37m'        # White
+COLOR_off='\e[0m'
+COLOR_black='\e[0;30m'
+COLOR_red='\e[0;31m'
+COLOR_green='\e[0;32m'
+COLOR_yellow='\e[0;33m'
+COLOR_blue='\e[0;34m'
+COLOR_purple='\e[0;35m'
+COLOR_cyan='\e[0;36m'
+COLOR_white='\e[0;37m'
 
 # * Args
 
