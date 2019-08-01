@@ -48,7 +48,7 @@ Rules:
 Options
   -d, --debug    Print debug info.
   -h, --help     I need somebody!
-  -v, --verbose  Increase verbosity.  May be given up to 2 times.
+  -v, --verbose  Increase verbosity, up to -vv.
 
   -f FILE, --file FILE  Check FILE in addition to discovered files.
 
