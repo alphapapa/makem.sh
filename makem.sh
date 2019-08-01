@@ -195,7 +195,7 @@ function test-ert {
 
 # * Defaults
 
-compile=
+compile=true
 load_path="."
 
 byte_compile_files=($(elisp_files))
@@ -203,7 +203,7 @@ test_files=($(test_files))
 
 # * Args
 
-args=$(getopt -n "$0" -o dhc -l debug,help,compile -- "$@") || { usage; exit 1; }
+args=$(getopt -n "$0" -o dhC -l debug,help,no-compile -- "$@") || { usage; exit 1; }
 eval set -- "$args"
 
 while true
@@ -216,8 +216,8 @@ do
             usage
             exit
             ;;
-        -c|--compile)
-            compile=true
+        -C|--no-compile)
+            unset compile
             ;;
         --)
             # Remaining args (required; do not remove)
