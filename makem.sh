@@ -58,31 +58,72 @@
 
 # * Elisp
 
-package_initialize=" (progn
+# These functions return a path to an elisp file which can be loaded
+# by Emacs on the command line with -l or --load.
+
+function elisp-checkdoc-file {
+    # Since checkdoc doesn't have a batch function that exits non-zero
+    # when errors are found, we make one.
+    local file=$(mktemp)
+
+    cat >$file <<EOF
+(require 'cl-lib)
+
+(defvar makem-checkdoc-errors-p nil)
+
+(defun makem-checkdoc-files-and-exit ()
+  "Run checkdoc-file on files remaining on command line, exiting non-zero if there are warnings."
+  (let* ((files (cl-loop for arg in command-line-args-left
+                         collect (expand-file-name arg)))
+         (checkdoc-create-error-function
+          (lambda (text start end &optional unfixable)
+            (let ((msg (concat (checkdoc-buffer-label) ":"
+                               (int-to-string (count-lines (point-min) (or start (point-min))))
+                               ": " text)))
+              (message msg)
+              (setq makem-checkdoc-errors-p t)
+              (list text start end unfixable)))))
+    (mapcar #'checkdoc-file files)
+    (when makem-checkdoc-errors-p
+      (kill-emacs 1))))
+
+(makem-checkdoc-files-and-exit)
+EOF
+    echo $file
+}
+
+function elisp-package-initialize-file {
+    local file=$(mktemp)
+
+    cat >$file <<EOF
 (require 'package)
-(setq package-archives (list (cons \"gnu\" \"https://elpa.gnu.org/packages/\")
-                             (cons \"melpa\" \"https://melpa.org/packages/\")
-                             (cons \"melpa-stable\" \"https://stable.melpa.org/packages/\")
-                             (cons \"org\" \"https://orgmode.org/elpa/\")))
+(setq package-archives (list (cons "gnu" "https://elpa.gnu.org/packages/")
+                             (cons "melpa" "https://melpa.org/packages/")
+                             (cons "melpa-stable" "https://stable.melpa.org/packages/")
+                             (cons "org" "https://orgmode.org/elpa/")))
 (package-initialize)
-(setq load-prefer-newer t))"
+(setq load-prefer-newer t)
+EOF
+    echo $file
+}
 
 # * Functions
 
 # ** Emacs
 
 function run_emacs {
-    debug "Running: emacs -Q --batch -L \"$load_path\" --eval \"$package_initialize\" $@"
+    local command="emacs -Q --batch -L \"$load_path\" --load=$package_initialize_file $@"
+
+    debug "Running: $command"
 
     output_file=$(mktemp)
-
-    emacs -Q --batch \
-          -L "$load_path" \
-          --eval "$package_initialize" \
-          "$@" &>$output_file
+    emacs -Q --batch -L "$load_path" \
+          --load=$package_initialize_file \
+          "$@" \
+        &>$output_file
 
     exit=$?
-    [[ $exit != 0 ]] && error "Emacs exited non-zero: $exit"
+    [[ $exit != 0 ]] && debug "Emacs exited non-zero: $exit"
     if [[ $verbose || $exit != 0 ]]
     then
         cat $output_file
@@ -104,17 +145,26 @@ function batch-byte-compile {
 
 # ** Files
 
-function elisp_files {
+function project-elisp-files {
     # Echo list of Elisp files in project.
-    git ls-files | egrep "\.el$" | default_file_filter
+    git ls-files | egrep "\.el$" | exclude-files
 }
 
-function test_files {
-    # Echo list of Elisp test files (files in test and/or tests subdirs).
-    elisp_files | default_file_filter | egrep '^tests?/'
+function project-elisp-files-non-test {
+    # Echo list of Elisp files that are not tests.
+    project-test-files invert
 }
 
-function default_file_filter {
+function project-test-files {
+    # Echo list of Elisp test files (files in test and/or tests
+    # subdirs).  If $1 is non-empty, return non-test files.
+    local invert
+    [[ $1 ]] && invert="-v"
+
+    project-elisp-files | exclude-files | egrep $invert '^tests?/'
+}
+
+function exclude-files {
     # Filter out paths (STDIN) which should be excluded by default.
     egrep -v "(/\.cask/|-autoloads.el)"
 }
@@ -130,7 +180,32 @@ function load_files_args {
     done
 }
 
+function files_args {
+    # For file in STDIN, echo "$file".
+    while read file
+    do
+        printf -- '%q ' "$file"
+    done
+}
+
 # ** Utility
+
+function cleanup {
+    # Remove temporary paths (${temp_paths[@]}).
+
+    for path in "${temp_paths[@]}"
+    do
+        if [[ $debug ]]
+        then
+            debug "Debugging enabled: not deleting temporary path: $path"
+        elif [[ -r $path ]]
+        then
+            rm -rf "$path"
+        else
+            debug "Temporary path doesn't exist, not deleting: $path"
+        fi
+    done
+}
 
 function debug {
     if [[ $debug ]]
@@ -156,6 +231,20 @@ function die {
 function log {
     echo -e "LOG ($(date "+%Y-%m-%d %H:%M:%S")): $@" >&2
 }
+function verbose {
+    if [[ $verbose ]]
+    then
+        function verbose {
+            log "$@"
+        }
+        verbose "$@"
+    else
+        function verbose {
+            true
+        }
+    fi
+}
+
 function usage {
     cat <<EOF
 $0 [OPTIONS] ...?
@@ -172,11 +261,47 @@ EOF
 
 # These functions are intended to be called as rules, like a Makefile.
 
-function compile {
-    log "Compiling..."
+function all {
+    verbose "Running all rules..."
 
-    batch-byte-compile "${byte_compile_files[@]}" \
+    lint
+    tests
+}
+
+function compile {
+    verbose "Compiling..."
+
+    batch-byte-compile "${project_byte_compile_files[@]}" \
         || error "Byte-compilation failed."
+}
+
+function lint {
+    verbose "Linting..."
+
+    lint-checkdoc
+    lint-package
+}
+
+function lint-checkdoc {
+    verbose "Linting checkdoc..."
+
+    local checkdoc_file=$(elisp-checkdoc-file)
+    temp_paths+=($checkdoc_file)
+
+    run_emacs \
+        --load=$(elisp-checkdoc-file) \
+        $(project-elisp-files-non-test) \
+        || error "Linting checkdoc failed."
+}
+
+function lint-package {
+    verbose "Linting package..."
+
+    run_emacs \
+        --eval "(require 'package-lint)" \
+        --funcall package-lint-batch-and-exit \
+        $(project-elisp-files-non-test | files_args) \
+        || error "Package linting failed."
 }
 
 function tests {
@@ -186,34 +311,39 @@ function tests {
 }
 
 function test-buttercup {
-    log "Running Buttercup tests..."
+    verbose "Running Buttercup tests..."
 
-    log "Buttercup support not yet implemented."
+    verbose "Buttercup support not yet implemented."
 }
 
 function test-ert {
     # Run ERT tests.
-    debug "Test files: ${test_files[@]}"
-    debug "Byte-compile files: ${byte_compile_files[@]}"
+    debug "Test files: ${project_test_files[@]}"
+    debug "Byte-compile files: ${project_byte_compile_files[@]}"
     debug "Compile: $compile"
 
     [[ $compile ]] && compile
 
-    log "Running ERT tests..."
+    verbose "Running ERT tests..."
 
     run_emacs \
-        $(load_files_args "${test_files[@]}") \
+        $(load_files_args "${project_test_files[@]}") \
         -f ert-run-tests-batch-and-exit \
         || error "ERT tests failed."
 }
 
 # * Defaults
 
+errors=0
+
 compile=true
 load_path="."
 
-byte_compile_files=($(elisp_files))
-test_files=($(test_files))
+project_byte_compile_files=($(project-elisp-files))
+project_test_files=($(project-test-files))
+
+package_initialize_file=$(elisp-package-initialize-file)
+temp_paths+=($package_initialize_file)
 
 # * Args
 
@@ -252,14 +382,29 @@ debug "Remaining args: ${rest[@]}"
 
 # * Main
 
+trap cleanup EXIT INT TERM
+
 for rule in "${rest[@]}"
 do
     if type "$rule" 2>/dev/null | grep "$rule is a function" &>/dev/null
     then
         $rule
+    elif [[ $rule = test ]]
+    then
+        # Allow the "tests" rule to be called as "test".  Since "test"
+        # is a shell builtin, this workaround is required.
+        tests
     else
         error "Invalid rule: $rule"
     fi
 done
+
+if [[ $errors -gt 0 ]]
+then
+    log "Finished with $errors errors."
+elif [[ $verbose ]]
+then
+    verbose "Finished with $errors errors."
+fi
 
 exit $errors
