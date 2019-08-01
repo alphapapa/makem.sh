@@ -112,9 +112,7 @@ EOF
 # ** Emacs
 
 function run_emacs {
-    local command="emacs -Q --batch -L \"$load_path\" --load=$package_initialize_file $@"
-
-    debug "Running: $command"
+    debug "Running: emacs -Q --batch -L \"$load_path\" --load=$package_initialize_file $@"
 
     output_file=$(mktemp)
     emacs -Q --batch -L "$load_path" \
@@ -310,7 +308,7 @@ function lint-checkdoc {
     temp_paths+=($checkdoc_file)
 
     run_emacs \
-        --load=$(elisp-checkdoc-file) \
+        --load=$checkdoc_file \
         $(project-elisp-files-non-test) \
         || error "Linting checkdoc failed."
 }
