@@ -310,7 +310,7 @@ function lint-checkdoc {
     run_emacs \
         --load=$checkdoc_file \
         $(project-elisp-files-non-test) \
-        || error "Linting checkdoc failed."
+        || error "Checkdoc linting failed."
 }
 
 function lint-package {
