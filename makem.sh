@@ -109,7 +109,7 @@ EOF
 # ** Emacs
 
 function run_emacs {
-    debug "Running: emacs -Q --batch -L \"$load_path\" --load=$package_initialize_file $@"
+    debug "run_emacs: emacs -Q --batch -L \"$load_path\" --load=$package_initialize_file $@"
 
     output_file=$(mktemp)
     emacs -Q --batch -L "$load_path" \
@@ -131,9 +131,12 @@ function run_emacs {
 # ** Compilation
 
 function batch-byte-compile {
-    debug "batch-byte-compile: $@"
+    debug "batch-byte-compile: ERROR-ON-WARN:$compile_error_on_warn  FILES:$@"
+
+    [[ $compile_error_on_warn ]] && local error_on_warn=(--eval "(setq byte-compile-error-on-warn t)")
 
     run_emacs \
+        "${error_on_warn[@]}" \
         --funcall batch-byte-compile \
         "$@"
 }
@@ -294,14 +297,15 @@ function compile {
     verbose 1 "Compiling..."
 
     batch-byte-compile "${project_byte_compile_files[@]}" \
-        && success "Byte-compilation finished without errors." \
-            || error "Byte-compilation failed."
+        && success "Compiling finished without errors." \
+            || error "Compiling failed."
 }
 
 function lint {
     verbose 1 "Linting..."
 
     lint-checkdoc
+    lint-compile
     lint-package
 }
 
@@ -314,8 +318,18 @@ function lint-checkdoc {
     run_emacs \
         --load=$checkdoc_file \
         $(project-elisp-files-non-test) \
-        && success "Checkdoc linting finished without errors." \
-            || error "Checkdoc linting failed."
+        && success "Linting checkdoc finished without errors." \
+            || error "Linting checkdoc failed."
+}
+
+function lint-compile {
+    verbose 1 "Linting compilation..."
+
+    compile_error_on_warn=true
+    batch-byte-compile "${project_byte_compile_files[@]}" \
+        && success "Linting compilation finished without errors." \
+            || error "Linting compilation failed."
+    unset compile_error_on_warn
 }
 
 function lint-package {
@@ -325,8 +339,8 @@ function lint-package {
         --eval "(require 'package-lint)" \
         --funcall package-lint-batch-and-exit \
         $(project-elisp-files-non-test | files_args) \
-        && success "Package linting finished without errors." \
-            || error "Package linting failed."
+        && success "Linting package finished without errors." \
+            || error "Linting package failed."
 }
 
 function tests {
