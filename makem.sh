@@ -64,7 +64,8 @@ package_initialize=" (progn
                              (cons \"melpa\" \"https://melpa.org/packages/\")
                              (cons \"melpa-stable\" \"https://stable.melpa.org/packages/\")
                              (cons \"org\" \"https://orgmode.org/elpa/\")))
-(package-initialize))"
+(package-initialize)
+(setq load-prefer-newer t))"
 
 # * Functions
 
