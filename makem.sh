@@ -310,13 +310,33 @@ function ts {
 
 function usage {
     cat <<EOF
-$0 [OPTIONS] ...?
+$0 [OPTIONS] RULES...
 
-This does something cool!
+Rules:
+  all      Run all lints and tests.
+  compile  Byte-compile source files.
+
+  lint           Run all lints.
+  lint-checkdoc  Run checkdoc.
+  lint-compile   Byte-compile source files with warnings as errors.
+  lint-package   Run package-lint.
+
+  test, tests     Run all tests.
+  test-buttercup  Run Buttercup tests.
+  test-ert        Run ERT tests.
 
 Options
-  -d, --debug  Print debug info
-  -h, --help   I need somebody!
+  -d, --debug    Print debug info.
+  -h, --help     I need somebody!
+  -v, --verbose  Increase verbosity.  May be given up to 2 times.
+
+  -f FILE, --file FILE  Check FILE in addition to discovered files.
+
+  --no-color        Disable color output.
+  -C, --no-compile  Don't compile files automatically.
+
+Source files are automatically discovered from git, or may be
+specified with options.
 EOF
 }
 
