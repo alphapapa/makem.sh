@@ -67,14 +67,11 @@ function elisp-checkdoc-file {
     local file=$(mktemp)
 
     cat >$file <<EOF
-(require 'cl-lib)
-
 (defvar makem-checkdoc-errors-p nil)
 
 (defun makem-checkdoc-files-and-exit ()
   "Run checkdoc-file on files remaining on command line, exiting non-zero if there are warnings."
-  (let* ((files (cl-loop for arg in command-line-args-left
-                         collect (expand-file-name arg)))
+  (let* ((files (mapcar #'expand-file-name command-line-args-left))
          (checkdoc-create-error-function
           (lambda (text start end &optional unfixable)
             (let ((msg (concat (checkdoc-buffer-label) ":"
