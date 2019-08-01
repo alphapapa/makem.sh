@@ -79,7 +79,7 @@ function run_emacs {
     emacs -Q --batch \
           -L "$load_path" \
           --eval "$package_initialize" \
-          "$@" >$output_file 2>&1
+          "$@" &>$output_file
 
     exit=$?
     [[ $exit != 0 ]] && error "Emacs exited non-zero: $exit"
