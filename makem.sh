@@ -235,7 +235,7 @@ function debug {
 }
 function error {
     echo_color red "ERROR ($(ts)): $@" >&2
-    ((errors++))  # Initializes automatically
+    ((errors++))
 }
 function die {
     error "$@"
