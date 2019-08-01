@@ -162,7 +162,8 @@ EOF
 function compile {
     log "Compiling..."
 
-    batch-byte-compile "${byte_compile_files[@]}"
+    batch-byte-compile "${byte_compile_files[@]}" \
+        || error "Byte-compilation failed."
 }
 
 function tests {
@@ -189,7 +190,8 @@ function test-ert {
 
     run_emacs \
         $(load_files_args "${test_files[@]}") \
-        -f ert-run-tests-batch-and-exit
+        -f ert-run-tests-batch-and-exit \
+        || error "ERT tests failed."
 }
 
 # * Defaults
@@ -243,3 +245,5 @@ do
         error "Invalid rule: $rule"
     fi
 done
+
+exit $errors
