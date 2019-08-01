@@ -82,7 +82,7 @@ function run_emacs {
           "$@" >$output_file 2>&1
 
     exit=$?
-    [[ $exit -gt 0 ]] && error "Emacs exited non-zero: $exit"
+    [[ $exit != 0 ]] && error "Emacs exited non-zero: $exit"
     if [[ $verbose || $exit != 0 ]]
     then
         cat $output_file
