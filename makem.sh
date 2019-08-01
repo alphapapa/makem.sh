@@ -207,11 +207,24 @@ function cleanup {
     done
 }
 
+function echo_color {
+    # This allows bold, italic, etc. without needing a function for
+    # each variation.
+    if [[ $color ]]
+    then
+        local color_code="COLOR_$1"
+        shift
+
+        echo -e "${!color_code}${@}${COLOR_off}"
+    else
+        echo "$@"
+    fi
+}
 function debug {
     if [[ $debug ]]
     then
         function debug {
-            echo "DEBUG: $@" >&2
+            echo_color yellow "DEBUG ($(ts)): $@" >&2
         }
         debug "$@"
     else
@@ -221,7 +234,7 @@ function debug {
     fi
 }
 function error {
-    echo "ERROR: $@" >&2
+    echo_color red "ERROR ($(ts)): $@" >&2
     ((errors++))  # Initializes automatically
 }
 function die {
@@ -229,15 +242,28 @@ function die {
     exit $errors
 }
 function log {
-    echo -e "LOG ($(date "+%Y-%m-%d %H:%M:%S")): $@" >&2
+    echo "LOG ($(ts)): $@" >&2
+}
+function log_color {
+    local color=$1
+    shift
+    echo_color $color "LOG ($(ts)): $@" >&2
 }
 function verbose {
     # $1 is the verbosity level, rest are echoed when appropriate.
     if [[ $verbose -ge $1 ]]
     then
+        local color
+        [[ $1 = 1 ]] && color=blue
+        [[ $1 = 2 ]] && color=cyan
+
         shift
-        log "$@"
+        log_color $color "$@" >&2
     fi
+}
+
+function ts {
+    date "+%Y-%m-%d %H:%M:%S"
 }
 
 function usage {
@@ -329,6 +355,7 @@ function test-ert {
 
 # * Defaults
 
+color=true
 errors=0
 verbose=0
 
@@ -341,9 +368,21 @@ project_test_files=($(project-test-files))
 package_initialize_file=$(elisp-package-initialize-file)
 temp_paths+=($package_initialize_file)
 
+# ** Colors
+
+COLOR_off='\e[0m'       # Text Reset
+COLOR_black='\e[0;30m'        # Black
+COLOR_red='\e[0;31m'          # Red
+COLOR_green='\e[0;32m'        # Green
+COLOR_yellow='\e[0;33m'       # Yellow
+COLOR_blue='\e[0;34m'         # Blue
+COLOR_purple='\e[0;35m'       # Purple
+COLOR_cyan='\e[0;36m'         # Cyan
+COLOR_white='\e[0;37m'        # White
+
 # * Args
 
-args=$(getopt -n "$0" -o dhvC -l debug,help,verbose,no-compile -- "$@") || { usage; exit 1; }
+args=$(getopt -n "$0" -o dhvC -l debug,help,verbose,no-color,no-compile -- "$@") || { usage; exit 1; }
 eval set -- "$args"
 
 while true
@@ -359,6 +398,9 @@ do
             ;;
         -v|--verbose)
             ((verbose++))
+            ;;
+        --no-color)
+            unset color
             ;;
         -C|--no-compile)
             unset compile
@@ -398,7 +440,7 @@ done
 
 if [[ $errors -gt 0 ]]
 then
-    log "Finished with $errors errors."
+    log_color red "Finished with $errors errors."
 elif [[ $verbose ]]
 then
     verbose 1 "Finished with $errors errors."
