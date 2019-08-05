@@ -22,12 +22,39 @@
 :TOC:      0
 :END:
 
-Copy =makem.sh= into your package's root directory.
+Copy =makem.sh= into your package's root directory.  Optionally, also copy =Makefile=, to make calling the script easier.
 
 * Usage
 :PROPERTIES:
 :TOC:      0
 :END:
+
+The =makem.sh= script can be called directly or through a =Makefile=.
+
+** Makefile
+
+A default =Makefile= is provided which calls the =makem.sh= script.  Call it like:
+
+#+BEGIN_EXAMPLE sh
+  # Run all rules:
+  $ make
+
+  # Run all lints.
+  $ make lint
+
+  # Run all tests.
+  $ make test
+
+  # Run all tests with verbosity level 1.
+  $ make v=v test
+
+  # Run all tests with verbosity level 2.
+  $ make v=vv test
+#+END_EXAMPLE
+
+Since a =-v= option is intercepted by =make= itself, the =v= variable is used instead when calling through the =Makefile=.
+
+** Script
 
 #+BEGIN_EXAMPLE
 makem.sh [OPTIONS] RULES...
