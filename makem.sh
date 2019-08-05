@@ -443,6 +443,7 @@ verbose=0
 compile=true
 load_path="."
 
+# TODO: Option to not byte-compile test files.
 project_byte_compile_files=($(project-elisp-files))
 project_source_files=($(project-source-files))
 project_test_files=($(project-test-files))
