@@ -201,14 +201,11 @@ function exclude-files {
     egrep -v "(/\.cask/|-autoloads.el)"
 }
 
-function load_files_args {
-    # For file in $@, echo "--load=$file".
-
-    # NOTE: Putting quotes around the %s causes Emacs to fail to load the
-    # file, even though running the command manually like that works.
+function load-files-args {
+    # For file in $@, echo "--load $file".
     for file in "$@"
     do
-        printf -- '--load=%s ' "$file"
+        printf -- '--load %q ' "$file"
     done
 }
 
@@ -427,7 +424,7 @@ function test-ert {
     verbose 1 "Running ERT tests..."
 
     run_emacs \
-        $(load_files_args "${project_test_files[@]}") \
+        $(load-files-args "${project_test_files[@]}") \
         -f ert-run-tests-batch-and-exit \
         && success "ERT tests finished without errors." \
             || error "ERT tests failed."
