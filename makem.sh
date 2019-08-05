@@ -365,11 +365,11 @@ function lint {
 function lint-checkdoc {
     verbose 1 "Linting checkdoc..."
 
-    local checkdoc_file=$(elisp-checkdoc-file)
-    temp_paths+=($checkdoc_file)
+    local checkdoc_file="$(elisp-checkdoc-file)"
+    temp_paths+=("$checkdoc_file")
 
     run_emacs \
-        --load=$checkdoc_file \
+        --load="$checkdoc_file" \
         "${project_source_files[@]}" \
         && success "Linting checkdoc finished without errors." \
             || error "Linting checkdoc failed."
@@ -405,12 +405,12 @@ function tests {
 function test-buttercup {
     verbose 1 "Running Buttercup tests..."
 
-    local buttercup_file=$(elisp-buttercup-file)
-    temp_paths+=($buttercup_file)
+    local buttercup_file="$(elisp-buttercup-file)"
+    temp_paths+=("$buttercup_file")
 
     run_emacs \
         --load buttercup \
-        --load $buttercup_file \
+        --load "$buttercup_file" \
         -f buttercup-run-discover \
         && success "Buttercup tests finished without errors." \
             || error "Buttercup tests failed."
@@ -448,8 +448,8 @@ project_byte_compile_files=($(project-elisp-files))
 project_source_files=($(project-source-files))
 project_test_files=($(project-test-files))
 
-package_initialize_file=$(elisp-package-initialize-file)
-temp_paths+=($package_initialize_file)
+package_initialize_file="$(elisp-package-initialize-file)"
+temp_paths+=("$package_initialize_file")
 
 # ** Colors
 
