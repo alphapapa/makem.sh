@@ -35,7 +35,7 @@ The =makem.sh= script can be called directly or through a =Makefile=.
 
 A default =Makefile= is provided which calls the =makem.sh= script.  Call it like:
 
-#+BEGIN_EXAMPLE sh
+#+BEGIN_SRC sh
   # Run all rules:
   $ make
 
@@ -50,7 +50,7 @@ A default =Makefile= is provided which calls the =makem.sh= script.  Call it lik
 
   # Run all tests with verbosity level 2.
   $ make v=vv test
-#+END_EXAMPLE
+#+END_SRC
 
 Since a =-v= option is intercepted by =make= itself, the =v= variable is used instead when calling through the =Makefile=.
 
