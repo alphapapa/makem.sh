@@ -188,12 +188,12 @@ function project-elisp-files {
 
 function project-source-files {
     # Echo list of Elisp files that are not tests.
-    project-elisp-files | exclude-files | egrep -v '^tests?/test-?'
+    project-elisp-files | egrep -v '^tests?/test-?'
 }
 
 function project-test-files {
-    # Echo list of Elisp test files (files in test and/or tests subdirs that start with "test").
-    project-elisp-files | exclude-files | egrep '^tests?/test-?'
+    # Echo list of Elisp test files.
+    project-elisp-files | egrep '^tests?/test-?'
 }
 
 function exclude-files {
@@ -291,9 +291,8 @@ function verbose {
     # $1 is the verbosity level, rest are echoed when appropriate.
     if [[ $verbose -ge $1 ]]
     then
-        local color
-        [[ $1 = 1 ]] && color=blue
-        [[ $1 = 2 ]] && color=cyan
+        [[ $1 -eq 1 ]] && local color=blue
+        [[ $1 -ge 2 ]] && local color=cyan
 
         shift
         log_color $color "$@" >&2
