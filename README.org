@@ -33,10 +33,10 @@ The =makem.sh= script can be called directly or through a =Makefile=.
 
 ** Makefile
 
-A default =Makefile= is provided which calls the =makem.sh= script.  Call it like:
+A default =Makefile= is provided which calls the =makem.sh= script.  Call it with the name of a rule and an optional verbosity level, like:
 
 #+BEGIN_SRC sh
-  # Run all rules:
+  # Run all rules.
   $ make
 
   # Run all lints.
@@ -45,16 +45,16 @@ A default =Makefile= is provided which calls the =makem.sh= script.  Call it lik
   # Run all tests.
   $ make test
 
-  # Run all tests with verbosity level 1.
-  $ make v=v test
+  # Run ERT tests with verbosity level 1.
+  $ make v=v test-ert
 
-  # Run all tests with verbosity level 2.
-  $ make v=vv test
+  # Run Buttercup tests with verbosity level 2.
+  $ make v=vv test-buttercup
 #+END_SRC
 
-Since a =-v= option is intercepted by =make= itself, the =v= variable is used instead when calling through the =Makefile=.
-
 ** Script
+
+The script may be called directly to specify additional options.
 
 #+BEGIN_EXAMPLE
 makem.sh [OPTIONS] RULES...
