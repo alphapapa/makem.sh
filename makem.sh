@@ -389,7 +389,7 @@ function lint-package {
     verbose 1 "Linting package..."
 
     run_emacs \
-        --eval "(require 'package-lint)" \
+        --load package-lint \
         --funcall package-lint-batch-and-exit \
         "${project_source_files[@]}" \
         && success "Linting package finished without errors." \
