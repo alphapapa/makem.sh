@@ -239,11 +239,11 @@ function cleanup {
 function echo_color {
     # This allows bold, italic, etc. without needing a function for
     # each variation.
+    local color_code="COLOR_$1"
+    shift
+
     if [[ $color ]]
     then
-        local color_code="COLOR_$1"
-        shift
-
         echo -e "${!color_code}${@}${COLOR_off}"
     else
         echo "$@"
