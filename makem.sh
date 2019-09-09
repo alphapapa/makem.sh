@@ -362,7 +362,7 @@ function compile {
 
     batch-byte-compile "${project_byte_compile_files[@]}" \
         && success "Compiling finished without errors." \
-            || error "Compiling failed."
+            || error "Compilation failed."
 }
 
 function lint {
