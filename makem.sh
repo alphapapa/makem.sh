@@ -275,7 +275,7 @@ function error {
     return 1
 }
 function die {
-    error "$@"
+    [[ $@ ]] && error "$@"
     exit $errors
 }
 function log {
