@@ -414,7 +414,7 @@ function tests {
 }
 
 function test-buttercup {
-    compile
+    compile || die "Compilation required for tests."
 
     verbose 1 "Running Buttercup tests..."
 
@@ -430,7 +430,7 @@ function test-buttercup {
 }
 
 function test-ert {
-    compile
+    compile || die "Compilation required for tests."
 
     verbose 1 "Running ERT tests..."
     debug "Test files: ${project_test_files[@]}"
