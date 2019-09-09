@@ -354,7 +354,7 @@ function all {
 }
 
 function compile {
-    [[ $compile ]] || return 1
+    [[ $compile ]] || return 0
     unset compile  # Only compile once.
 
     verbose 1 "Compiling..."
