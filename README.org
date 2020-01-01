@@ -6,6 +6,8 @@
 
 =makem.sh= is a script to help build and test Emacs Lisp packages (not Emacs itself).  It aims to make linting and testing as simple as possible.  Source files and test files are discovered automatically from the project's Git repo.  Output is simple: by default, there is no output unless errors occur.  With increasing verbosity levels (with =-v= or =-vv= options), more detail gives positive feedback.  Output is colored by default to make reading easy.
 
+Testing can also be done with [[https://github.com/alphapapa/emacs-sandbox.sh][emacs-sandbox.sh]], which allows package dependencies to be installed into the sandbox automatically, without affecting the developer's personal Emacs configuration.  This is especially helpful when upstream dependencies may have released new versions that differ from the developer's personal configuration.
+
 * Screenshots
 
 Some example output.  The first shows running the =test= rule with verbosity level 1, which shows which tests are run but omits each test's output unless it fails:
@@ -72,6 +74,9 @@ A default =Makefile= is provided which calls the =makem.sh= script.  Call it wit
 
   # Run Buttercup tests with verbosity level 2.
   $ make v=vv test-buttercup
+
+  # Run tests with emacs-sandbox.sh and automatically install dependencies.
+  $ make sandbox=t autoinstall=t test
 #+END_SRC
 
 ** Script
@@ -79,33 +84,46 @@ A default =Makefile= is provided which calls the =makem.sh= script.  Call it wit
 The script may be called directly to specify additional options.
 
 #+BEGIN_EXAMPLE
-makem.sh [OPTIONS] RULES...
+  makem.sh [OPTIONS] RULES...
 
-Rules:
-  all      Run all lints and tests.
-  compile  Byte-compile source files.
+  Rules:
+    all      Run all lints and tests.
+    compile  Byte-compile source files.
 
-  lint           Run all lints.
-  lint-checkdoc  Run checkdoc.
-  lint-compile   Byte-compile source files with warnings as errors.
-  lint-package   Run package-lint.
+    lint           Run all lints.
+    lint-checkdoc  Run checkdoc.
+    lint-compile   Byte-compile source files with warnings as errors.
+    lint-package   Run package-lint.
 
-  test, tests     Run all tests.
-  test-buttercup  Run Buttercup tests.
-  test-ert        Run ERT tests.
+    test, tests     Run all tests.
+    test-buttercup  Run Buttercup tests.
+    test-ert        Run ERT tests.
 
-Options:
-  -d, --debug    Print debug info.
-  -h, --help     I need somebody!
-  -v, --verbose  Increase verbosity, up to -vv.
+  Options:
+    -d, --debug    Print debug info.
+    -h, --help     I need somebody!
+    -v, --verbose  Increase verbosity, up to -vv.
 
-  -f FILE, --file FILE  Check FILE in addition to discovered files.
+    --debug-load-path  Print load-path.
 
-  --no-color        Disable color output.
-  -C, --no-compile  Don't compile files automatically.
+    -f FILE, --file FILE  Check FILE in addition to discovered files.
 
-Source files are automatically discovered from git, or may be
-specified with options.
+    --no-color        Disable color output.
+    -C, --no-compile  Don't compile files automatically.
+
+  Sandbox options:
+    These require emacs-sandbox.sh to be on your PATH.  Find it at
+    <https://github.com/alphapapa/emacs-sandbox.sh>.
+
+    --sandbox              Run Emacs with emacs-sandbox.sh.
+    --auto-install         Automatically install package dependencies.
+    -i, --install PACKAGE  Install PACKAGE before running rules.
+
+  Source files are automatically discovered from git, or may be
+  specified with options.
+
+  Package dependencies are discovered from "Package-Requires" headers in
+  source files.
 #+END_EXAMPLE
 
 * Changelog
