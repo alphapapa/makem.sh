@@ -142,8 +142,7 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
   #!/bin/sh
 
   # * Commit parameters
-
-  # See man 5 githooks.
+  # Unused now, but good for future reference.  See man 5 githooks.
 
   remote="$1"
   url="$2"
@@ -152,10 +151,16 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 
   # * Run tests
 
-  if ! make test sandbox=t autoinstall=t
-  then
-      exit 1
-  fi
+  # Not using sandbox and auto-install, because "git push" shouldn't
+  # cause remote code to be downloaded and executed (i.e. what would
+  # happen by installing packages).  It can be done manually when
+  # needed.  However, in a CI system running in a container, where
+  # testing in a clean config against the latest available dependency
+  # versions is desired, one could use:
+
+  #   make sandbox=t autoinstall=t test
+
+  make test
 #+END_SRC
 
 * Changelog
