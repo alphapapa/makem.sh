@@ -338,7 +338,6 @@ Options:
   -d, --debug    Print debug info.
   -h, --help     I need somebody!
   -v, --verbose  Increase verbosity, up to -vv.
-
   --debug-load-path  Print load-path.
 
   -f FILE, --file FILE  Check FILE in addition to discovered files.
