@@ -2,8 +2,32 @@
 
 # * makem.sh --- Script to aid building and testing Emacs Lisp packages
 
+# https://github.com/alphapapa/makem.sh
+
 # * Commentary:
 
+# makem.sh is a script helps to build, lint, and test Emacs Lisp
+# packages.  It aims to make linting and testing as simple as possible
+# without requiring per-package configuration.
+
+# It works similarly to a Makefile in that "rules" are called to
+# perform actions such as byte-compiling, linting, testing, etc.
+
+# Source and test files are discovered automatically from the
+# project's Git repo, and package dependencies within them are parsed
+# automatically.
+
+# Output is simple: by default, there is no output unless errors
+# occur.  With increasing verbosity levels, more detail gives positive
+# feedback.  Output is colored by default to make reading easy.
+
+# When desired, emacs-sandbox.sh can be used as a backend, which
+# allows package dependencies to be installed automatically into a
+# clean Emacs "sandbox" configuration without affecting the
+# developer's personal configuration.  This is especially helpful when
+# upstream dependencies may have released new versions that differ
+# from those installed in the developer's personal configuration.  See
+# <https://github.com/alphapapa/emacs-sandbox.sh>.
 
 # * License:
 
