@@ -145,21 +145,21 @@ EOF
 # ** Emacs
 
 function run_emacs {
-    debug "run_emacs: emacs -Q --batch --load=$package_initialize_file -L \"$load_path\" $@"
+    debug "run_emacs: $emacs_command -Q --batch --load=$package_initialize_file -L \"$load_path\" $@"
     if [[ $debug_load_path ]]
     then
-        debug $(emacs -Q --batch \
-                      --load=$package_initialize_file \
-                      -L "$load_path" \
-                      --eval "(message \"LOAD-PATH: %s\" load-path)" \
-                      2>&1)
+        debug $($emacs_command -Q --batch \
+                               --load=$package_initialize_file \
+                               -L "$load_path" \
+                               --eval "(message \"LOAD-PATH: %s\" load-path)" \
+                               2>&1)
     fi
 
     output_file=$(mktemp)
-    emacs -Q --batch  \
-          --load=$package_initialize_file \
-          -L "$load_path" \
-          "$@" \
+    $emacs_command -Q --batch  \
+                   --load=$package_initialize_file \
+                   -L "$load_path" \
+                   "$@" \
         &>$output_file
 
     exit=$?
@@ -337,6 +337,13 @@ Options:
   --no-color        Disable color output.
   -C, --no-compile  Don't compile files automatically.
 
+Sandbox options:
+  These require emacs-sandbox.sh to be on your PATH.  Find it at
+  <https://github.com/alphapapa/emacs-sandbox.sh>.
+
+  --sandbox              Run Emacs with emacs-sandbox.sh.
+  -i, --install PACKAGE  Install PACKAGE before running rules.
+
 Source files are automatically discovered from git, or may be
 specified with options.
 EOF
@@ -444,6 +451,8 @@ function test-ert {
 
 # * Defaults
 
+emacs_command="emacs"
+
 # TODO: Disable color if not outputting to a terminal.
 color=true
 errors=0
@@ -474,7 +483,7 @@ COLOR_white='\e[0;37m'
 
 # * Args
 
-args=$(getopt -n "$0" -o dhvf:C -l debug,debug-load-path,help,verbose,file:,no-color,no-compile -- "$@") || { usage; exit 1; }
+args=$(getopt -n "$0" -o dhi:svf:C -l debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,sandbox -- "$@") || { usage; exit 1; }
 eval set -- "$args"
 
 while true
@@ -490,6 +499,13 @@ do
         -h|--help)
             usage
             exit
+            ;;
+        -i|--install)
+            shift
+            sandbox_install_packages_args+=(--install "$1")
+            ;;
+        -s|--sandbox)
+            sandbox=true
             ;;
         -v|--verbose)
             ((verbose++))
@@ -522,6 +538,32 @@ debug "Remaining args: ${rest[@]}"
 # * Main
 
 trap cleanup EXIT INT TERM
+
+if [[ $sandbox ]]
+then
+    # Setup sandbox.
+    config_dir=$(mktemp -d) || die "Unable to make temp dir."
+    temp_paths+=("$config_dir")
+
+    sandbox_basic_args=(
+        -d "$config_dir"
+    )
+    [[ $debug ]] && sandbox_basic_args+=(--debug)
+
+    # Initialize the sandbox (installs packages once rather than for
+    # every rule.
+    emacs_command="emacs-sandbox.sh ${sandbox_basic_args[@]} ${sandbox_install_packages_args[@]} -- "
+    debug "Initializing sandbox..."
+
+    run_emacs || die "Unable to initialize sandbox."
+
+    # After the sandbox is initialized and packages are installed, set
+    # the command to prevent the package lists from being refreshed on
+    # each invocation.
+    emacs_command="emacs-sandbox.sh ${sandbox_basic_args[@]} --no-refresh-packages -- "
+
+    debug "Sandbox initialized."
+fi
 
 if ! [[ ${project_source_files[@]} ]]
 then
