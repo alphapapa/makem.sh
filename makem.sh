@@ -248,6 +248,23 @@ function files_args {
     done
 }
 
+function buttercup-tests-p {
+    # Return 0 if Buttercup tests are found.
+    debug "Checking for Buttercup tests..."
+
+    grep "(require 'buttercup)" $(project-test-files) &>/dev/null
+}
+
+function ert-tests-p {
+    # Return 0 if ERT tests are found.
+    debug "Checking for ERT tests..."
+
+    # We check for this rather than "(require 'ert)", because ERT may
+    # already be loaded in Emacs and might not be loaded with
+    # "require" in a test file.
+    grep "(ert-deftest" $(project-test-files) &>/dev/null
+}
+
 function dependencies {
     # Echo list of package dependencies.
     egrep '^;; Package-Requires: ' $(project-source-files) $(project-test-files) \
@@ -457,6 +474,7 @@ function tests {
 }
 
 function test-buttercup {
+    buttercup-tests-p || return 0
     compile || die
 
     verbose 1 "Running Buttercup tests..."
@@ -473,6 +491,7 @@ function test-buttercup {
 }
 
 function test-ert {
+    ert-tests-p || return 0
     compile || die
 
     verbose 1 "Running ERT tests..."
