@@ -229,7 +229,7 @@ function project-test-files {
 
 function exclude-files {
     # Filter out paths (STDIN) which should be excluded by default.
-    egrep -v "(/\.cask/|-autoloads.el)"
+    egrep -v "(/\.cask/|-autoloads.el|.dir-locals)"
 }
 
 function load-files-args {
