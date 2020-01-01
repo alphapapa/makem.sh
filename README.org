@@ -15,6 +15,9 @@ Output is simple: by default, there is no output unless errors occur.  With incr
 When desired, [[https://github.com/alphapapa/emacs-sandbox.sh][emacs-sandbox.sh]] can be used as a backend, which allows package dependencies to be installed automatically into a clean Emacs "sandbox" configuration without affecting the developer's personal configuration.  This is especially helpful when upstream dependencies may have released new versions that differ from those installed in the developer's personal configuration.
 
 * Screenshots
+:PROPERTIES:
+:TOC:      ignore
+:END:
 
 Some example output.  The first shows running the =test= rule with verbosity level 1, which shows which tests are run but omits each test's output unless it fails:
 
@@ -40,12 +43,12 @@ Of course, with increased verbosity, it also shows which rules did not signal er
 :PROPERTIES:
 :TOC:      this
 :END:
-  -  [[#installation][Installation]]
-  -  [[#usage][Usage]]
-  -  [[#changelog][Changelog]]
-  -  [[#credits][Credits]]
-  -  [[#development][Development]]
-  -  [[#license][License]]
+-  [[#installation][Installation]]
+-  [[#usage][Usage]]
+-  [[#changelog][Changelog]]
+-  [[#credits][Credits]]
+-  [[#development][Development]]
+-  [[#license][License]]
 
 * Installation
 :PROPERTIES:
