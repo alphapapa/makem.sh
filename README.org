@@ -134,6 +134,30 @@ The script may be called directly to specify additional options.
   source files.
 #+END_EXAMPLE
 
+** git pre-push hook
+
+It's often helpful to run tests automatically before pushing with git.  Here's an example of using =makem.sh= in a =pre-push= hook:
+
+#+BEGIN_SRC sh
+  #!/bin/sh
+
+  # * Commit parameters
+
+  # See man 5 githooks.
+
+  remote="$1"
+  url="$2"
+
+  read local_ref local_sha remote_ref remote_sha
+
+  # * Run tests
+
+  if ! make test sandbox=t autoinstall=t
+  then
+      exit 1
+  fi
+#+END_SRC
+
 * Changelog
 :PROPERTIES:
 :TOC:      0
