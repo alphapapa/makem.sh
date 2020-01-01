@@ -224,6 +224,15 @@ function files_args {
     done
 }
 
+function dependencies {
+    # Echo list of package dependencies.
+    egrep '^;; Package-Requires: ' $(project-source-files) $(project-test-files) \
+        | egrep -o '\([^([:space:]][^)]*\)' \
+        | egrep -o '^[^[:space:])]+' \
+        | sed -r 's/\(//g' \
+        | egrep -v '^emacs$'  # Ignore Emacs version requirement.
+}
+
 # ** Utility
 
 function cleanup {
@@ -342,10 +351,14 @@ Sandbox options:
   <https://github.com/alphapapa/emacs-sandbox.sh>.
 
   --sandbox              Run Emacs with emacs-sandbox.sh.
+  --auto-install         Automatically install package dependencies.
   -i, --install PACKAGE  Install PACKAGE before running rules.
 
 Source files are automatically discovered from git, or may be
 specified with options.
+
+Package dependencies are discovered from "Package-Requires" headers in
+source files.
 EOF
 }
 
@@ -483,12 +496,15 @@ COLOR_white='\e[0;37m'
 
 # * Args
 
-args=$(getopt -n "$0" -o dhi:svf:C -l debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,sandbox -- "$@") || { usage; exit 1; }
+args=$(getopt -n "$0" -o dhi:svf:C -l auto-install,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,sandbox -- "$@") || { usage; exit 1; }
 eval set -- "$args"
 
 while true
 do
     case "$1" in
+        --auto-install)
+            auto_install=true
+            ;;
         -d|--debug)
             debug=true
             verbose=2
@@ -549,6 +565,17 @@ then
         -d "$config_dir"
     )
     [[ $debug ]] && sandbox_basic_args+=(--debug)
+
+    if [[ $auto_install ]]
+    then
+        deps=($(dependencies))
+        debug "Installing dependencies: ${deps[@]}"
+
+        for package in "${deps[@]}"
+        do
+            sandbox_install_packages_args+=(--install $package)
+        done
+    fi
 
     # Initialize the sandbox (installs packages once rather than for
     # every rule.
