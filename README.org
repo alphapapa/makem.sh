@@ -131,7 +131,7 @@ The script may be called directly to specify additional options.
   specified with options.
 
   Package dependencies are discovered from "Package-Requires" headers in
-  source files.
+  source files and from a Cask file.
 #+END_EXAMPLE
 
 ** git pre-push hook

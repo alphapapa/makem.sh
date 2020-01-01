@@ -267,11 +267,20 @@ function ert-tests-p {
 
 function dependencies {
     # Echo list of package dependencies.
+
+    # Search package headers.
     egrep '^;; Package-Requires: ' $(project-source-files) $(project-test-files) \
         | egrep -o '\([^([:space:]][^)]*\)' \
         | egrep -o '^[^[:space:])]+' \
         | sed -r 's/\(//g' \
         | egrep -v '^emacs$'  # Ignore Emacs version requirement.
+
+    # Search Cask file.
+    if [[ -r Cask ]]
+    then
+        egrep '\(depends-on "[^"]+"\)' Cask \
+            | sed -r -e 's/\(depends-on //g' -e 's/"//g' -e 's/\)+//g'
+    fi
 }
 
 # ** Utility
@@ -398,7 +407,7 @@ Source files are automatically discovered from git, or may be
 specified with options.
 
 Package dependencies are discovered from "Package-Requires" headers in
-source files.
+source files and from a Cask file.
 EOF
 }
 
