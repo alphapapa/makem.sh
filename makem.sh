@@ -219,12 +219,12 @@ function project-elisp-files {
 
 function project-source-files {
     # Echo list of Elisp files that are not tests.
-    project-elisp-files | egrep -v '^tests?/test-?'
+    project-elisp-files | egrep -v '^tests?/'
 }
 
 function project-test-files {
     # Echo list of Elisp test files.
-    project-elisp-files | egrep '^tests?/test-?'
+    project-elisp-files | egrep '^tests?/'
 }
 
 function exclude-files {
