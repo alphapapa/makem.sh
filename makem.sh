@@ -607,6 +607,8 @@ fi
 if [[ $sandbox ]]
 then
     # Setup sandbox.
+    type emacs-sandbox.sh &>/dev/null || die "emacs-sandbox.sh not found."
+
     config_dir=$(mktemp -d) || die "Unable to make temp dir."
     temp_paths+=("$config_dir")
 
