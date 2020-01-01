@@ -224,7 +224,7 @@ function project-source-files {
 
 function project-test-files {
     # Echo list of Elisp test files.
-    project-elisp-files | egrep '^tests?/'
+    project-elisp-files | egrep '^(tests?|t)/'
 }
 
 function exclude-files {
