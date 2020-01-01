@@ -598,6 +598,12 @@ debug "Remaining args: ${rest[@]}"
 
 trap cleanup EXIT INT TERM
 
+if ! [[ ${project_source_files[@]} ]]
+then
+    error "No files specified and not in a git repo."
+    exit 1
+fi
+
 if [[ $sandbox ]]
 then
     # Setup sandbox.
@@ -621,7 +627,7 @@ then
     fi
 
     # Initialize the sandbox (installs packages once rather than for
-    # every rule.
+    # every rule).
     emacs_command="emacs-sandbox.sh ${sandbox_basic_args[@]} ${sandbox_install_packages_args[@]} -- "
     debug "Initializing sandbox..."
 
@@ -635,12 +641,7 @@ then
     debug "Sandbox initialized."
 fi
 
-if ! [[ ${project_source_files[@]} ]]
-then
-    error "No files specified and not in a git repo."
-    exit 1
-fi
-
+# Run rules.
 for rule in "${rest[@]}"
 do
     if type "$rule" 2>/dev/null | grep "$rule is a function" &>/dev/null
