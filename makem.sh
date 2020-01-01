@@ -468,7 +468,8 @@ function lint-package {
 }
 
 function tests {
-    # Run tests.
+    verbose 1 "Running all tests..."
+
     test-ert
     test-buttercup
 }
