@@ -39,16 +39,9 @@ Of course, with increased verbosity, it also shows which rules did not signal er
 
 [[images/make-all-v.png]]
 
-* Contents                                                         :noexport:
-:PROPERTIES:
-:TOC:      this
-:END:
--  [[#installation][Installation]]
--  [[#usage][Usage]]
--  [[#changelog][Changelog]]
--  [[#credits][Credits]]
--  [[#development][Development]]
--  [[#license][License]]
+The included =test.yml= GitHub Actions file can be used to easily set up CI, giving output like:
+
+[[images/github-action.png]]
 
 * Installation
 :PROPERTIES:
@@ -141,6 +134,13 @@ The script may be called directly to specify additional options.
   source files and from a Cask file.
 #+END_EXAMPLE
 
+** GitHub Action
+
+Using Steve Purcell's [[https://github.com/purcell/setup-emacs][setup-emacs]] Action and my [[https://github.com/alphapapa/emacs-sandbox.sh][emacs-sandbox.sh]], it's easy to set up CI on GitHub for an Emacs package.  
+
+1.  Put =makem.sh= in your package's repo and make it executable.
+2.  Add =test.yml= to your package's repo at =.github/workflows/test.yml=.  It should work without modification for most Emacs packages.
+
 ** git pre-push hook
 
 It's often helpful to run tests automatically before pushing with git.  Here's an example of using =makem.sh= in a =pre-push= hook:
@@ -169,7 +169,6 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 
   make test
 #+END_SRC
-
 * Changelog
 :PROPERTIES:
 :TOC:      0
