@@ -288,8 +288,8 @@ function dependencies {
     # Search Cask file.
     if [[ -r Cask ]]
     then
-        egrep '\(depends-on "[^"]+"\)' Cask \
-            | sed -r -e 's/\(depends-on //g' -e 's/"//g' -e 's/\)+//g'
+        egrep '\(depends-on "[^"]+"' Cask \
+            | sed -r -e 's/\(depends-on "([^"]+)".*/\1/g'
     fi
 }
 
