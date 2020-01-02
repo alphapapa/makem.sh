@@ -206,7 +206,7 @@ function buttercup-tests-p {
     # Return 0 if Buttercup tests are found.
     debug "Checking for Buttercup tests..."
 
-    grep "(require 'buttercup)" $(project-test-files) &>/dev/null
+    grep "(require 'buttercup)" "${project_test_files[@]}" &>/dev/null
 }
 
 function ert-tests-p {
@@ -216,7 +216,7 @@ function ert-tests-p {
     # We check for this rather than "(require 'ert)", because ERT may
     # already be loaded in Emacs and might not be loaded with
     # "require" in a test file.
-    grep "(ert-deftest" $(project-test-files) &>/dev/null
+    grep "(ert-deftest" "${project_test_files[@]}" &>/dev/null
 }
 
 function dependencies {
