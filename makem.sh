@@ -527,6 +527,26 @@ errors=0
 verbose=0
 
 compile=true
+
+# TODO: Using the current directory (i.e. a package's repo root directory) in
+# load-path can cause weird errors in case of--you guessed it--stale .ELC files,
+# the zombie problem that just won't die.  It's incredible how many different ways
+# this problem presents itself.  In this latest example, an old .ELC file, for a
+# .EL file that had since been renamed, was present on my local system, which meant
+# that an example .EL file that hadn't been updated was able to "require" that .ELC
+# file's feature without error.  But on another system (in this case, trying to
+# setup CI using GitHub Actions), the old .ELC was not present, so the example .EL
+# file was not able to load the feature, which caused a byte-compilation error.
+
+# In this case, I will prevent such example files from being compiled.  But in
+# general, this can cause weird problems that are tedious to debug.  I guess
+# the best way to fix it would be to actually install the repo's code as a
+# package into the sandbox, but doing that would require additional tooling,
+# pulling in something like Quelpa or package-build--and if the default recipe
+# weren't being used, the actual recipe would have to be fetched off MELPA or
+# something, which seems like getting too smart for our own good.
+
+# TODO: Emit a warning if .ELC files that don't match any .EL files are detected.
 load_path="."
 
 # TODO: Option to not byte-compile test files.
