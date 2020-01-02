@@ -219,7 +219,7 @@ function project-elisp-files {
 
 function project-source-files {
     # Echo list of Elisp files that are not tests.
-    project-elisp-files | egrep -v "$test_files_regexp"
+    project-elisp-files | egrep -v "$test_files_regexp" | feature-files
 }
 
 function project-test-files {
@@ -230,6 +230,16 @@ function project-test-files {
 function exclude-files {
     # Filter out paths (STDIN) which should be excluded by default.
     egrep -v "(/\.cask/|-autoloads.el|.dir-locals)"
+}
+
+function feature-files {
+    # Read paths on STDIN and echo ones that (provide 'a-feature).
+    while read path
+    do
+        debug "PATH: $path"
+        egrep "^\\(provide '" "$path" &>/dev/null \
+            && echo "$path"
+    done
 }
 
 function load-files-args {
@@ -552,9 +562,9 @@ compile=true
 load_path="."
 
 # TODO: Option to not byte-compile test files.
-project_byte_compile_files=($(project-elisp-files))
 project_source_files=($(project-source-files))
 project_test_files=($(project-test-files))
+project_byte_compile_files=("${project_source_files[@]}" "${project_test_files[@]}")
 
 package_initialize_file="$(elisp-package-initialize-file)"
 temp_paths+=("$package_initialize_file")
