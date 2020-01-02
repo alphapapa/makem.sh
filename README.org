@@ -70,7 +70,7 @@ A default =Makefile= is provided which calls the =makem.sh= script.  Call it wit
 
 #+BEGIN_SRC sh
   # Run all rules.
-  $ make
+  $ make all
 
   # Run all lints.
   $ make lint
