@@ -548,7 +548,11 @@ COLOR_white='\e[0;37m'
 
 # * Args
 
-args=$(getopt -n "$0" -o dhi:svf:C -l auto-install,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,sandbox -- "$@") || { usage; exit 1; }
+args=$(getopt -n "$0" \
+              -o dhi:svf:C \
+              -l auto-install,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,sandbox \
+              -- "$@") \
+    || { usage; exit 1; }
 eval set -- "$args"
 
 while true
