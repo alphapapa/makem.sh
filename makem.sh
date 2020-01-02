@@ -219,12 +219,12 @@ function project-elisp-files {
 
 function project-source-files {
     # Echo list of Elisp files that are not tests.
-    project-elisp-files | egrep -v '^tests?/'
+    project-elisp-files | egrep -v "$test_files_regexp"
 }
 
 function project-test-files {
     # Echo list of Elisp test files.
-    project-elisp-files | egrep '^(tests?|t)/'
+    project-elisp-files | egrep "$test_files_regexp"
 }
 
 function exclude-files {
@@ -518,6 +518,8 @@ function test-ert {
 }
 
 # * Defaults
+
+test_files_regexp='^(tests?|t)/'
 
 emacs_command="emacs"
 
