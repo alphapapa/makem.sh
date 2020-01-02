@@ -44,63 +44,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# * Safety
+# * Functions
 
-# NOTE: These are disabled by default in this template but should be
-# enabled when feasible.  Documentation is from the Bash man page.
-
-# ** errexit
-
-# Exit immediately if a pipeline (which may consist of a single simple
-# command), a list, or a compound command (see SHELL GRAMMAR above),
-# exits with a non-zero status.  The shell does not exit if the
-# command that fails is part of the command list immediately following
-# a while or until keyword, part of the test following the if or elif
-# reserved words, part of any command executed in a && or || list
-# except the command follow‐ ing the final && or ||, any command in a
-# pipeline but the last, or if the command's return value is being
-# inverted with !.  If a compound command other than a subshell
-# returns a non-zero status because a command failed while -e was
-# being ignored, the shell does not exit.  A trap on ERR, if set, is
-# executed before the shell exits.  This option applies to the shell
-# environment and each subshell environment separately (see COMMAND
-# EXECUTION ENVIRONMENT above), and may cause subshells to exit before
-# executing all the commands in the subshell.
-
-# If a compound command or shell function executes in a context where
-# -e is being ignored, none of the commands executed within the
-# compound command or function body will be affected by the -e
-# setting, even if -e is set and a command returns a failure status.
-# If a compound command or shell function sets -e while executing in a
-# context where -e is ignored, that setting will not have any effect
-# until the compound command or the command containing the function
-# call completes.
-
-# set -o errexit
-
-# ** nounset
-
-# Treat unset variables and parameters other than the special
-# parameters "@" and "*" as an error when performing parameter
-# expansion.  If expansion is attempted on an unset variable or
-# parameter, the shell prints an error message, and, if not
-# interactive, exits with a non-zero status.
-
-# NOTE: When this is not enabled, individual variables can be required
-# to be set by using "${var:?}" parameter expansion syntax.
-
-# set -o nounset
-
-# ** pipefail
-
-# If set, the return value of a pipeline is the value of the last
-# (rightmost) command to exit with a non-zero status, or zero if all
-# commands in the pipeline exit successfully.  This option is disabled
-# by default.
-
-# set -o pipefail
-
-# * Elisp
+# ** Elisp
 
 # These functions return a path to an elisp file which can be loaded
 # by Emacs on the command line with -l or --load.
@@ -163,8 +109,6 @@ function elisp-package-initialize-file {
 EOF
     echo $file
 }
-
-# * Functions
 
 # ** Emacs
 
@@ -530,15 +474,15 @@ function test-ert {
 # * Defaults
 
 test_files_regexp='^(tests?|t)/'
-
 emacs_command="emacs"
-
-# TODO: Disable color if not outputting to a terminal.
-color=true
 errors=0
 verbose=0
-
 compile=true
+
+# MAYBE: Disable color if not outputting to a terminal.  (OTOH, the
+# colorized output is helpful in CI logs, and I don't know if,
+# e.g. GitHub Actions logging pretends to be a terminal.)
+color=true
 
 # TODO: Using the current directory (i.e. a package's repo root directory) in
 # load-path can cause weird errors in case of--you guessed it--stale .ELC files,
@@ -561,14 +505,6 @@ compile=true
 # TODO: Emit a warning if .ELC files that don't match any .EL files are detected.
 load_path="."
 
-# TODO: Option to not byte-compile test files.
-project_source_files=($(project-source-files))
-project_test_files=($(project-test-files))
-project_byte_compile_files=("${project_source_files[@]}" "${project_test_files[@]}")
-
-package_initialize_file="$(elisp-package-initialize-file)"
-temp_paths+=("$package_initialize_file")
-
 # ** Colors
 
 COLOR_off='\e[0m'
@@ -580,6 +516,17 @@ COLOR_blue='\e[0;34m'
 COLOR_purple='\e[0;35m'
 COLOR_cyan='\e[0;36m'
 COLOR_white='\e[0;37m'
+
+# * Project files
+
+# MAYBE: Option to not byte-compile test files.  (OTOH, byte-compiling reveals many
+# errors that would otherwise go unnoticed, so it's worth it to fix the warnings.)
+project_source_files=($(project-source-files))
+project_test_files=($(project-test-files))
+project_byte_compile_files=("${project_source_files[@]}" "${project_test_files[@]}")
+
+package_initialize_file="$(elisp-package-initialize-file)"
+temp_paths+=("$package_initialize_file")
 
 # * Args
 
