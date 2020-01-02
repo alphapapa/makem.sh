@@ -14,6 +14,18 @@ Output is simple: by default, there is no output unless errors occur.  With incr
 
 When desired, [[https://github.com/alphapapa/emacs-sandbox.sh][emacs-sandbox.sh]] can be used as a backend, which allows package dependencies to be installed automatically into a clean Emacs "sandbox" configuration without affecting the developer's personal configuration.  This is especially helpful when upstream dependencies may have released new versions that differ from those installed in the developer's personal configuration.
 
+* Contents                                                         :noexport:
+:PROPERTIES:
+:TOC:      this
+:END:
+-  [[#installation][Installation]]
+-  [[#usage][Usage]]
+  -  [[#makefile][Makefile]]
+  -  [[#script][Script]]
+  -  [[#github-action][GitHub Action]]
+  -  [[#git-pre-push-hook][git pre-push hook]]
+-  [[#changelog][Changelog]]
+
 * Screenshots
 :PROPERTIES:
 :TOC:      ignore
@@ -52,7 +64,7 @@ Copy =makem.sh= into your package's root directory.  Optionally, also copy =Make
 
 * Usage
 :PROPERTIES:
-:TOC:      0
+:TOC:      1
 :END:
 
 The =makem.sh= script can be called directly or through a =Makefile=.  Use =makem.sh --help= to list available rules.
@@ -179,14 +191,23 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 Initial release.
 
 * Credits
+:PROPERTIES:
+:TOC:      ignore
+:END:
 
 Inspired by Damien Cassou's excellent [[https://gitlab.petton.fr/DamienCassou/makel][makel]] project.
 
 * Development
+:PROPERTIES:
+:TOC:      ignore
+:END:
 
 Bug reports, feature requests, suggestions — /oh my/!
 
 * License
+:PROPERTIES:
+:TOC:      ignore
+:END:
 
 GPLv3
 
