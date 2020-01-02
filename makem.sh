@@ -202,8 +202,14 @@ function files_args {
     done
 }
 
+function test-files-p {
+    # Return 0 if $project_test_files is non-empty.
+    [[ "${project_test_files[@]}" ]]
+}
+
 function buttercup-tests-p {
     # Return 0 if Buttercup tests are found.
+    test-files-p || die "No tests found."
     debug "Checking for Buttercup tests..."
 
     grep "(require 'buttercup)" "${project_test_files[@]}" &>/dev/null
@@ -211,6 +217,7 @@ function buttercup-tests-p {
 
 function ert-tests-p {
     # Return 0 if ERT tests are found.
+    test-files-p || die "No tests found."
     debug "Checking for ERT tests..."
 
     # We check for this rather than "(require 'ert)", because ERT may
