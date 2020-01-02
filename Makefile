@@ -2,8 +2,8 @@
 
 # For consistency, we use only var=val options, not hyphen-prefixed options.
 
-ifdef autoinstall
-	AUTOINSTALL = "--auto-install"
+ifdef auto-install
+	AUTO_INSTALL = "--auto-install"
 endif
 
 ifdef sandbox
@@ -33,4 +33,4 @@ endif
 # directory by that name exists, which can confuse Make.
 
 %:
-	@./makem.sh $(VERBOSE) $(SANDBOX) $(SANDBOX_DIR) $(AUTOINSTALL) $(@)
+	@./makem.sh $(VERBOSE) $(SANDBOX) $(SANDBOX_DIR) $(AUTO_INSTALL) $(@)
