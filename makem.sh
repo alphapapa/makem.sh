@@ -676,6 +676,7 @@ then
 
     if [[ $auto_install ]]
     then
+        # Add dependencies to package install list.
         deps=($(dependencies))
         debug "Installing dependencies: ${deps[@]}"
 
@@ -685,11 +686,14 @@ then
         done
     fi
 
-    # Initialize the sandbox (installs packages once rather than for every rule).
-    emacs_command="emacs-sandbox.sh ${sandbox_basic_args[@]} ${sandbox_install_packages_args[@]} -- "
-    debug "Initializing sandbox..."
+    if [[ ${sandbox_install_packages_args[@]} ]]
+    then
+        # Initialize the sandbox (installs packages once rather than for every rule).
+        emacs_command="emacs-sandbox.sh ${sandbox_basic_args[@]} ${sandbox_install_packages_args[@]} -- "
+        debug "Initializing sandbox..."
 
-    run_emacs || die "Unable to initialize sandbox."
+        run_emacs || die "Unable to initialize sandbox."
+    fi
 
     # After the sandbox is initialized and packages are installed, set the command
     # to prevent the package lists from being refreshed on each invocation.
