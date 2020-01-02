@@ -10,6 +10,10 @@ ifdef sandbox
 	SANDBOX = "--sandbox"
 endif
 
+ifdef sandbox-dir
+	SANDBOX_DIR = "--sandbox-dir" "$(sandbox-dir)"
+endif
+
 # ** Verbosity
 
 # Since the "-v" in "make -v" gets intercepted by Make itself, we have
@@ -29,4 +33,4 @@ endif
 # directory by that name exists, which can confuse Make.
 
 %:
-	@./makem.sh $(VERBOSE) $(SANDBOX) $(AUTOINSTALL) $(@)
+	@./makem.sh $(VERBOSE) $(SANDBOX) $(SANDBOX_DIR) $(AUTOINSTALL) $(@)

@@ -399,7 +399,10 @@ Sandbox options:
   These require emacs-sandbox.sh to be on your PATH.  Find it at
   <https://github.com/alphapapa/emacs-sandbox.sh>.
 
-  --sandbox              Run Emacs with emacs-sandbox.sh.
+  -s, --sandbox          Run Emacs with emacs-sandbox.sh in a temporary
+                         directory (removing directory on exit).
+  -S, --sandbox-dir DIR  Use DIR for the sandbox directory (leaving it
+                         on exit).  Implies -s.
   --auto-install         Automatically install package dependencies.
   -i, --install PACKAGE  Install PACKAGE before running rules.
 
@@ -549,8 +552,8 @@ COLOR_white='\e[0;37m'
 # * Args
 
 args=$(getopt -n "$0" \
-              -o dhi:svf:C \
-              -l auto-install,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,sandbox \
+              -o dhi:sS:vf:C \
+              -l auto-install,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,sandbox,sandbox-dir: \
               -- "$@") \
     || { usage; exit 1; }
 eval set -- "$args"
@@ -578,6 +581,11 @@ do
             ;;
         -s|--sandbox)
             sandbox=true
+            ;;
+        -S|--sandbox-dir)
+            shift
+            sandbox=true
+            sandbox_dir="$1"
             ;;
         -v|--verbose)
             ((verbose++))
@@ -622,11 +630,15 @@ then
     # Setup sandbox.
     type emacs-sandbox.sh &>/dev/null || die "emacs-sandbox.sh not found."
 
-    config_dir=$(mktemp -d) || die "Unable to make temp dir."
-    temp_paths+=("$config_dir")
+    if ! [[ $sandbox_dir ]]
+    then
+        # No sandbox dir specified: make temp dir and remove it on exit.
+        sandbox_dir=$(mktemp -d) || die "Unable to make temp dir."
+        temp_paths+=("$sandbox_dir")
+    fi
 
     sandbox_basic_args=(
-        -d "$config_dir"
+        -d "$sandbox_dir"
     )
     [[ $debug ]] && sandbox_basic_args+=(--debug)
 

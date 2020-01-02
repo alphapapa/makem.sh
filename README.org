@@ -84,8 +84,15 @@ A default =Makefile= is provided which calls the =makem.sh= script.  Call it wit
   # Run Buttercup tests with verbosity level 2.
   $ make v=vv test-buttercup
 
-  # Run tests with emacs-sandbox.sh and automatically install dependencies.
+  # Run tests with emacs-sandbox.sh in a temporary sandbox and
+  # automatically install dependencies.
   $ make sandbox=t autoinstall=t test
+
+  # Like previous, but use a permanent sandbox directory.  The developer
+  # might choose to recreate it manually when necessary, leaving it in
+  # place to save time otherwise.
+  $ mkdir sandbox
+  $ make sandbox-dir=sandbox autoinstall=t test
 #+END_SRC
 
 ** Script
