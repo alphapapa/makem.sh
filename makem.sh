@@ -46,6 +46,53 @@
 
 # * Functions
 
+function usage {
+    cat <<EOF
+$0 [OPTIONS] RULES...
+
+Rules:
+  all      Run all lints and tests.
+  compile  Byte-compile source files.
+
+  lint           Run all lints.
+  lint-checkdoc  Run checkdoc.
+  lint-compile   Byte-compile source files with warnings as errors.
+  lint-package   Run package-lint.
+
+  test, tests     Run all tests.
+  test-buttercup  Run Buttercup tests.
+  test-ert        Run ERT tests.
+
+Options:
+  -d, --debug    Print debug info.
+  -h, --help     I need somebody!
+  -v, --verbose  Increase verbosity, up to -vv.
+  --debug-load-path  Print load-path.
+
+  -f FILE, --file FILE  Check FILE in addition to discovered files.
+
+  --no-color        Disable color output.
+  -C, --no-compile  Don't compile files automatically.
+
+Sandbox options:
+  These require emacs-sandbox.sh to be on your PATH.  Find it at
+  <https://github.com/alphapapa/emacs-sandbox.sh>.
+
+  -s, --sandbox          Run Emacs with emacs-sandbox.sh in a temporary
+                         directory (removing directory on exit).
+  -S, --sandbox-dir DIR  Use DIR for the sandbox directory (leaving it
+                         on exit).  Implies -s.
+  --auto-install         Automatically install package dependencies.
+  -i, --install PACKAGE  Install PACKAGE before running rules.
+
+Source files are automatically discovered from git, or may be
+specified with options.
+
+Package dependencies are discovered from "Package-Requires" headers in
+source files and from a Cask file.
+EOF
+}
+
 # ** Elisp
 
 # These functions return a path to an elisp file which can be loaded
@@ -326,53 +373,6 @@ function verbose {
 
 function ts {
     date "+%Y-%m-%d %H:%M:%S"
-}
-
-function usage {
-    cat <<EOF
-$0 [OPTIONS] RULES...
-
-Rules:
-  all      Run all lints and tests.
-  compile  Byte-compile source files.
-
-  lint           Run all lints.
-  lint-checkdoc  Run checkdoc.
-  lint-compile   Byte-compile source files with warnings as errors.
-  lint-package   Run package-lint.
-
-  test, tests     Run all tests.
-  test-buttercup  Run Buttercup tests.
-  test-ert        Run ERT tests.
-
-Options:
-  -d, --debug    Print debug info.
-  -h, --help     I need somebody!
-  -v, --verbose  Increase verbosity, up to -vv.
-  --debug-load-path  Print load-path.
-
-  -f FILE, --file FILE  Check FILE in addition to discovered files.
-
-  --no-color        Disable color output.
-  -C, --no-compile  Don't compile files automatically.
-
-Sandbox options:
-  These require emacs-sandbox.sh to be on your PATH.  Find it at
-  <https://github.com/alphapapa/emacs-sandbox.sh>.
-
-  -s, --sandbox          Run Emacs with emacs-sandbox.sh in a temporary
-                         directory (removing directory on exit).
-  -S, --sandbox-dir DIR  Use DIR for the sandbox directory (leaving it
-                         on exit).  Implies -s.
-  --auto-install         Automatically install package dependencies.
-  -i, --install PACKAGE  Install PACKAGE before running rules.
-
-Source files are automatically discovered from git, or may be
-specified with options.
-
-Package dependencies are discovered from "Package-Requires" headers in
-source files and from a Cask file.
-EOF
 }
 
 # * Rules
