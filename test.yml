@@ -1,6 +1,27 @@
+# * test.yml --- Test Emacs packages using makem.sh on GitHub Actions
+
+# https://github.com/alphapapa/makem.sh
+
 # Based on Steve Purcell's examples at
 # <https://github.com/purcell/setup-emacs/blob/master/.github/workflows/test.yml>,
 # <https://github.com/purcell/package-lint/blob/master/.github/workflows/test.yml>.
+
+# * License:
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# * Code:
 
 name: "CI"
 on:
@@ -45,3 +66,7 @@ jobs:
     - name: Test
       if: always()  # Run test even if linting fails.
       run: ./makem.sh -vv --sandbox-dir=$SANDBOX_DIR test
+
+# Local Variables:
+# eval: (outline-minor-mode)
+# End:
