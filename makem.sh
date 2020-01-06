@@ -51,8 +51,10 @@ function usage {
 $0 [OPTIONS] RULES...
 
 Rules:
-  all      Run all lints and tests.
-  compile  Byte-compile source files.
+  all          Run all lints and tests.
+  compile      Byte-compile source files.
+  interactive  Run Emacs interactively, loading project source files
+               automatically.  Most useful with --sandbox and --auto-install.
 
   lint           Run all lints.
   lint-checkdoc  Run checkdoc.
@@ -160,10 +162,10 @@ EOF
 # ** Emacs
 
 function run_emacs {
-    debug "run_emacs: $emacs_command -Q --batch --load=$package_initialize_file -L \"$load_path\" $@"
+    debug "run_emacs: $emacs_command -Q $batch_arg --load=$package_initialize_file -L \"$load_path\" $@"
     if [[ $debug_load_path ]]
     then
-        debug $($emacs_command -Q --batch \
+        debug $($emacs_command -Q $batch_arg \
                                --load=$package_initialize_file \
                                -L "$load_path" \
                                --eval "(message \"LOAD-PATH: %s\" load-path)" \
@@ -171,7 +173,7 @@ function run_emacs {
     fi
 
     output_file=$(mktemp)
-    $emacs_command -Q --batch  \
+    $emacs_command -Q $batch_arg \
                    --load=$package_initialize_file \
                    -L "$load_path" \
                    "$@" \
@@ -398,6 +400,14 @@ function compile {
             || error "Compilation failed."
 }
 
+function interactive {
+    # Run Emacs interactively.  Most useful with --sandbox and --auto-install.
+    unset batch_arg
+    run_emacs \
+        $(load-files-args "${project_source_files[@]}")
+    batch_arg="--batch"
+}
+
 function lint {
     verbose 1 "Linting..."
 
@@ -485,6 +495,7 @@ emacs_command="emacs"
 errors=0
 verbose=0
 compile=true
+batch_arg="--batch"
 
 # MAYBE: Disable color if not outputting to a terminal.  (OTOH, the
 # colorized output is helpful in CI logs, and I don't know if,
