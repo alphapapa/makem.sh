@@ -110,8 +110,6 @@ The script may be called directly to specify additional options.
   Rules:
     all      Run all lints and tests.
     compile  Byte-compile source files.
-    interactive  Run Emacs interactively, loading project source files
-                 automatically.  Most useful with --sandbox and --auto-install.
 
     lint           Run all lints.
     lint-checkdoc  Run checkdoc.
@@ -121,6 +119,13 @@ The script may be called directly to specify additional options.
     test, tests     Run all tests.
     test-buttercup  Run Buttercup tests.
     test-ert        Run ERT tests.
+
+    These are especially useful with --sandbox:
+
+      batch        Run Emacs in batch mode, loading project source and test files
+                   automatically, with remaining args (after "--") passed to Emacs.
+      interactive  Run Emacs interactively, loading project source and test files
+                   automatically.
 
   Options:
     -d, --debug    Print debug info.

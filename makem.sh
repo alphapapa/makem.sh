@@ -51,10 +51,8 @@ function usage {
 $0 [OPTIONS] RULES...
 
 Rules:
-  all          Run all lints and tests.
-  compile      Byte-compile source files.
-  interactive  Run Emacs interactively, loading project source files
-               automatically.  Most useful with --sandbox and --auto-install.
+  all      Run all lints and tests.
+  compile  Byte-compile source files.
 
   lint           Run all lints.
   lint-checkdoc  Run checkdoc.
@@ -64,6 +62,13 @@ Rules:
   test, tests     Run all tests.
   test-buttercup  Run Buttercup tests.
   test-ert        Run ERT tests.
+
+  These are especially useful with --sandbox:
+
+    batch        Run Emacs in batch mode, loading project source and test files
+                 automatically, with remaining args (after "--") passed to Emacs.
+    interactive  Run Emacs interactively, loading project source and test files
+                 automatically.
 
 Options:
   -d, --debug    Print debug info.
@@ -400,11 +405,20 @@ function compile {
             || error "Compilation failed."
 }
 
+function batch {
+    # Run Emacs with $batch_args and with project source and test files loaded.
+    verbose 1 "Executing Emacs with arguments: ${batch_args[@]}"
+
+    run_emacs \
+        $(load-files-args "${project_source_files[@]}" "${project_test_files[@]}") \
+        "${batch_args[@]}"
+}
+
 function interactive {
     # Run Emacs interactively.  Most useful with --sandbox and --auto-install.
     unset batch_arg
     run_emacs \
-        $(load-files-args "${project_source_files[@]}")
+        $(load-files-args "${project_source_files[@]}" "${project_test_files[@]}")
     batch_arg="--batch"
 }
 
@@ -670,7 +684,16 @@ fi
 # Run rules.
 for rule in "${rest[@]}"
 do
-    if type "$rule" 2>/dev/null | grep "$rule is a function" &>/dev/null
+    if [[ $batch ]]
+    then
+        debug "Adding batch argument: $rule"
+        batch_args+=("$rule")
+
+    elif [[ $rule = batch ]]
+    then
+        # Remaining arguments are passed to Emacs.
+        batch=true
+    elif type "$rule" 2>/dev/null | grep "$rule is a function" &>/dev/null
     then
         $rule
     elif [[ $rule = test ]]
@@ -682,6 +705,9 @@ do
         error "Invalid rule: $rule"
     fi
 done
+
+# The batch rule.
+[[ $batch ]] && batch
 
 if [[ $errors -gt 0 ]]
 then
