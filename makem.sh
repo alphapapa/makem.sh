@@ -180,6 +180,7 @@ function run_emacs {
     output_file=$(mktemp)
     $emacs_command -Q $batch_arg \
                    --load=$package_initialize_file \
+                   --eval "(if (and (version< emacs-version \"26.3\") (>= libgnutls-version 30600))(setq gnutls-algorithm-priority \"NORMAL:-VERS-TLS1.3\"))" \
                    -L "$load_path" \
                    "$@" \
         &>$output_file
