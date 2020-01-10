@@ -213,12 +213,12 @@ function batch-byte-compile {
 
 function files-project-elisp {
     # Echo list of Elisp files in project.
-    git ls-files 2>/dev/null | egrep "\.el$" | files-exclude
+    git ls-files 2>/dev/null | egrep "\.el$" | filter-files-exclude
 }
 
 function files-project-source {
     # Echo list of Elisp files that are not tests.
-    files-project-elisp | egrep -v "$test_files_regexp" | files-feature
+    files-project-elisp | egrep -v "$test_files_regexp" | filter-files-feature
 }
 
 function files-project-test {
@@ -226,12 +226,12 @@ function files-project-test {
     files-project-elisp | egrep "$test_files_regexp"
 }
 
-function files-exclude {
+function filter-files-exclude {
     # Filter out paths (STDIN) which should be excluded by default.
     egrep -v "(/\.cask/|-autoloads.el|.dir-locals)"
 }
 
-function files-feature {
+function filter-files-feature {
     # Read paths on STDIN and echo ones that (provide 'a-feature).
     while read path
     do
