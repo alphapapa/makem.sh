@@ -21,13 +21,11 @@
 # occur.  With increasing verbosity levels, more detail gives positive
 # feedback.  Output is colored by default to make reading easy.
 
-# When desired, emacs-sandbox.sh can be used as a backend, which
-# allows package dependencies to be installed automatically into a
-# clean Emacs "sandbox" configuration without affecting the
-# developer's personal configuration.  This is especially helpful when
+# The script can run Emacs with the developer's local Emacs
+# configuration, or with a clean, "sandbox" configuration that can be
+# optionally removed afterward.  This is especially helpful when
 # upstream dependencies may have released new versions that differ
-# from those installed in the developer's personal configuration.  See
-# <https://github.com/alphapapa/emacs-sandbox.sh>.
+# from those installed in the developer's personal configuration.
 
 # * License:
 
@@ -63,18 +61,17 @@ Rules:
   test-buttercup  Run Buttercup tests.
   test-ert        Run ERT tests.
 
-  These are especially useful with --sandbox:
-
-    batch        Run Emacs in batch mode, loading project source and test files
-                 automatically, with remaining args (after "--") passed to Emacs.
-    interactive  Run Emacs interactively, loading project source and test files
-                 automatically.
+  batch        Run Emacs in batch mode, loading project source and test files
+               automatically, with remaining args (after "--") passed to Emacs.
+  interactive  Run Emacs interactively, loading project source and test files
+               automatically.
 
 Options:
   -d, --debug    Print debug info.
   -h, --help     I need somebody!
   -v, --verbose  Increase verbosity, up to -vv.
-  --debug-load-path  Print load-path.
+
+  --debug-load-path  Print load-path from inside Emacs.
 
   -f FILE, --file FILE  Check FILE in addition to discovered files.
 
@@ -82,10 +79,7 @@ Options:
   -C, --no-compile  Don't compile files automatically.
 
 Sandbox options:
-  These require emacs-sandbox.sh to be on your PATH.  Find it at
-  <https://github.com/alphapapa/emacs-sandbox.sh>.
-
-  -s, --sandbox          Run Emacs with emacs-sandbox.sh in a temporary
+  -s, --sandbox          Run Emacs with an empty config in a temporary
                          directory (removing directory on exit).
   -S, --sandbox-dir DIR  Use DIR for the sandbox directory (leaving it
                          on exit).  Implies -s.
@@ -93,10 +87,8 @@ Sandbox options:
   -i, --install PACKAGE  Install PACKAGE before running rules.
 
 Source files are automatically discovered from git, or may be
-specified with options.
-
-Package dependencies are discovered from "Package-Requires" headers in
-source files and from a Cask file.
+specified with options.  Package dependencies are discovered from
+"Package-Requires" headers in source files and from a Cask file.
 EOF
 }
 
@@ -156,8 +148,8 @@ function elisp-package-initialize-file {
 (require 'package)
 (setq package-archives (list (cons "gnu" "https://elpa.gnu.org/packages/")
                              (cons "melpa" "https://melpa.org/packages/")
-                             (cons "melpa-stable" "https://stable.melpa.org/packages/")
-                             (cons "org" "https://orgmode.org/elpa/")))
+                             (cons "melpa-stable" "https://stable.melpa.org/packages/")))
+$elisp_org_package_archive
 (package-initialize)
 (setq load-prefer-newer t)
 EOF
@@ -167,30 +159,39 @@ EOF
 # ** Emacs
 
 function run_emacs {
-    debug "run_emacs: $emacs_command -Q $batch_arg --load=$package_initialize_file -L \"$load_path\" $@"
-    if [[ $debug_load_path ]]
-    then
-        debug $($emacs_command -Q $batch_arg \
-                               --load=$package_initialize_file \
-                               -L "$load_path" \
-                               --eval "(message \"LOAD-PATH: %s\" load-path)" \
-                               2>&1)
-    fi
+    # NOTE: The sandbox args need to come before the package
+    # initialization so Emacs will use the sandbox's packages.
+    local emacs_command=(
+        "${emacs_command[@]}"
+        -Q
+        "${args_sandbox[@]}"
+        -l $package_initialize_file
+        $batch_arg
+        -L "$load_path"
+    )
 
+    # Show debug message with load-path from inside Emacs.
+    [[ $debug_load_path ]] \
+        && debug $("${emacs_command[@]}" \
+                       --batch \
+                       --eval "(message \"LOAD-PATH: %s\" load-path)" \
+                    2>&1)
+
+    # Set output file.
     output_file=$(mktemp)
-    $emacs_command -Q $batch_arg \
-                   --load=$package_initialize_file \
-                   -L "$load_path" \
-                   "$@" \
-        &>$output_file
+    temp_paths+=("$output_file")
 
+    # Run Emacs.
+    debug "run_emacs: ${emacs_command[@]} $@ &>\"$output_file\""
+    "${emacs_command[@]}" "$@" &>"$output_file"
+
+    # Check exit code and output.
     exit=$?
-    [[ $exit != 0 ]] && debug "Emacs exited non-zero: $exit"
-    if [[ $verbose -gt 1 || $exit != 0 ]]
-    then
-        cat $output_file
-    fi
-    rm -f $output_file
+    [[ $exit != 0 ]] \
+        && debug "Emacs exited non-zero: $exit"
+
+    [[ $verbose -gt 1 || $exit != 0 ]] \
+        && cat $output_file
 
     return $exit
 }
@@ -298,6 +299,63 @@ function dependencies {
     fi
 }
 
+# ** Sandbox
+
+function sandbox {
+    # Initialize sandbox.
+
+    # *** Sandbox arguments
+
+    # Check or make user-emacs-directory.
+    if [[ $sandbox_dir ]]
+    then
+        # Directory given as argument: ensure it exists.
+        [[ -d $sandbox_dir ]] || die "Directory doesn't exist: $sandbox_dir"
+    else
+        # Not given: make temp directory, and delete it on exit.
+        local sandbox_dir=$(mktemp -d) || die "Unable to make temp dir."
+        temp_paths+=("$sandbox_dir")
+    fi
+
+    # Make argument to load init file if it exists.
+    init_file="$sandbox_dir/init.el"
+    [[ -r $init_file ]] \
+        && local args_load_init_file=(--load "$init_file")
+
+    # Set sandbox args.  This is a global variable used by the run_emacs function.
+    args_sandbox=(
+        --eval "(setq user-emacs-directory (file-truename \"$sandbox_dir\"))"
+        --eval "(setq user-init-file (file-truename \"$init_file\"))"
+        "${args_load_init_file[@]}"
+    )
+
+    # Add package-install arguments for dependencies.
+    if [[ $auto_install ]]
+    then
+        local deps=($(dependencies))
+        debug "Installing dependencies: ${deps[@]}"
+
+        for package in "${deps[@]}"
+        do
+            args_sandbox_package_install+=(--eval "(package-install '$package)")
+        done
+    fi
+
+    # *** Install packages into sandbox
+
+    if [[ ${args_sandbox_package_install[@]} ]]
+    then
+        # Initialize the sandbox (installs packages once rather than for every rule).
+        debug "Initializing sandbox..."
+
+        run_emacs \
+            --eval "(package-refresh-contents)" \
+            "${args_sandbox_package_install[@]}" \
+            || die "Unable to initialize sandbox."
+    fi
+
+    debug "Sandbox initialized."
+}
 # ** Utility
 
 function cleanup {
@@ -505,7 +563,8 @@ function test-ert {
 # * Defaults
 
 test_files_regexp='^(tests?|t)/'
-emacs_command="emacs"
+
+emacs_command=("emacs")
 errors=0
 verbose=0
 compile=true
@@ -549,6 +608,23 @@ COLOR_purple='\e[0;35m'
 COLOR_cyan='\e[0;36m'
 COLOR_white='\e[0;37m'
 
+# ** Package system args
+
+args_package_archives=(
+    --eval "(add-to-list 'package-archives '(\"gnu\" . \"https://elpa.gnu.org/packages/\") t)"
+    --eval "(add-to-list 'package-archives '(\"melpa\" . \"https://melpa.org/packages/\") t)"
+)
+
+args_org_package_archives=(
+    --eval "(add-to-list 'package-archives '(\"org\" . \"https://orgmode.org/elpa/\") t)"
+)
+
+args_package_init=(
+    --eval "(package-initialize)"
+)
+
+elisp_org_package_archive="(add-to-list 'package-archives '(\"org\" . \"https://orgmode.org/elpa/\") t)"
+
 # * Project files
 
 # MAYBE: Option to not byte-compile test files.  (OTOH, byte-compiling reveals many
@@ -557,14 +633,13 @@ project_source_files=($(project-source-files))
 project_test_files=($(project-test-files))
 project_byte_compile_files=("${project_source_files[@]}" "${project_test_files[@]}")
 
-package_initialize_file="$(elisp-package-initialize-file)"
 temp_paths+=("$package_initialize_file")
 
 # * Args
 
 args=$(getopt -n "$0" \
-              -o dhi:sS:vf:C \
-              -l auto-install,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,sandbox,sandbox-dir: \
+              -o dhi:sS:vf:CO \
+              -l auto-install,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-org-repo,sandbox,sandbox-dir: \
               -- "$@") \
     || { usage; exit 1; }
 eval set -- "$args"
@@ -588,7 +663,7 @@ do
             ;;
         -i|--install)
             shift
-            sandbox_install_packages_args+=(--install "$1")
+            args_sandbox_package_install+=(--eval "(package-install '$1)")
             ;;
         -s|--sandbox)
             sandbox=true
@@ -605,6 +680,9 @@ do
             shift
             project_source_files+=("$1")
             project_byte_compile_files+=("$1")
+            ;;
+        -O|--no-org-repo)
+            unset elisp_org_package_archive
             ;;
         --no-color)
             unset color
@@ -626,6 +704,9 @@ done
 debug "ARGS: $args"
 debug "Remaining args: ${rest[@]}"
 
+# Set package elisp (which depends on --no-org-repo arg).
+package_initialize_file="$(elisp-package-initialize-file)"
+
 # * Main
 
 trap cleanup EXIT INT TERM
@@ -636,50 +717,8 @@ then
     exit 1
 fi
 
-if [[ $sandbox ]]
-then
-    # Setup sandbox.
-    type emacs-sandbox.sh &>/dev/null || die "emacs-sandbox.sh not found."
-
-    if ! [[ $sandbox_dir ]]
-    then
-        # No sandbox dir specified: make temp dir and remove it on exit.
-        sandbox_dir=$(mktemp -d) || die "Unable to make temp dir."
-        temp_paths+=("$sandbox_dir")
-    fi
-
-    sandbox_basic_args=(
-        -d "$sandbox_dir"
-    )
-    [[ $debug ]] && sandbox_basic_args+=(--debug)
-
-    if [[ $auto_install ]]
-    then
-        # Add dependencies to package install list.
-        deps=($(dependencies))
-        debug "Installing dependencies: ${deps[@]}"
-
-        for package in "${deps[@]}"
-        do
-            sandbox_install_packages_args+=(--install $package)
-        done
-    fi
-
-    if [[ ${sandbox_install_packages_args[@]} ]]
-    then
-        # Initialize the sandbox (installs packages once rather than for every rule).
-        emacs_command="emacs-sandbox.sh ${sandbox_basic_args[@]} ${sandbox_install_packages_args[@]} -- "
-        debug "Initializing sandbox..."
-
-        run_emacs || die "Unable to initialize sandbox."
-    fi
-
-    # After the sandbox is initialized and packages are installed, set the command
-    # to prevent the package lists from being refreshed on each invocation.
-    emacs_command="emacs-sandbox.sh ${sandbox_basic_args[@]} --no-refresh-packages -- "
-
-    debug "Sandbox initialized."
-fi
+[[ $sandbox ]] \
+    && sandbox
 
 # Run rules.
 for rule in "${rest[@]}"
