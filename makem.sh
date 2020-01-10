@@ -710,8 +710,8 @@ then
     exit 1
 fi
 
-[[ $sandbox ]] \
-    && sandbox
+# Initialize sandbox.
+[[ $sandbox ]] && sandbox
 
 # Run rules.
 for rule in "${rest[@]}"
