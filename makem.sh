@@ -348,6 +348,7 @@ function sandbox {
 
     debug "Sandbox initialized."
 }
+
 # ** Utility
 
 function cleanup {
