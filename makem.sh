@@ -178,7 +178,7 @@ function run_emacs {
                     2>&1)
 
     # Set output file.
-    output_file=$(mktemp)
+    output_file=$(mktemp) || die "Unable to make output file."
     paths_temp+=("$output_file")
 
     # Run Emacs.
@@ -305,7 +305,7 @@ function sandbox {
         [[ -d $sandbox_dir ]] || die "Directory doesn't exist: $sandbox_dir"
     else
         # Not given: make temp directory, and delete it on exit.
-        local sandbox_dir=$(mktemp -d) || die "Unable to make temp dir."
+        local sandbox_dir=$(mktemp -d) || die "Unable to make sandbox dir."
         paths_temp+=("$sandbox_dir")
     fi
 
@@ -626,8 +626,6 @@ files_project_source=($(files-project-source))
 files_project_test=($(files-project-test))
 files_project_byte_compile=("${files_project_source[@]}" "${files_project_test[@]}")
 
-paths_temp+=("$package_initialize_file")
-
 # * Args
 
 args=$(getopt -n "$0" \
@@ -699,6 +697,7 @@ debug "Remaining args: ${rest[@]}"
 
 # Set package elisp (which depends on --no-org-repo arg).
 package_initialize_file="$(elisp-package-initialize-file)"
+paths_temp+=("$package_initialize_file")
 
 # * Main
 
