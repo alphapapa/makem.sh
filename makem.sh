@@ -724,7 +724,7 @@ do
     then
         # Remaining arguments are passed to Emacs.
         batch=true
-    elif type "$rule" 2>/dev/null | grep "$rule is a function" &>/dev/null
+    elif type -t "$rule" 2>/dev/null | grep function &>/dev/null
     then
         $rule
     elif [[ $rule = test ]]
