@@ -407,9 +407,9 @@ function log {
     echo "LOG ($(ts)): $@" >&2
 }
 function log_color {
-    local color=$1
+    local color_name=$1
     shift
-    echo_color $color "LOG ($(ts)): $@" >&2
+    echo_color $color_name "LOG ($(ts)): $@" >&2
 }
 function success {
     if [[ $verbose -ge 2 ]]
@@ -421,11 +421,11 @@ function verbose {
     # $1 is the verbosity level, rest are echoed when appropriate.
     if [[ $verbose -ge $1 ]]
     then
-        [[ $1 -eq 1 ]] && local color=blue
-        [[ $1 -ge 2 ]] && local color=cyan
+        [[ $1 -eq 1 ]] && local color_name=blue
+        [[ $1 -ge 2 ]] && local color_name=cyan
 
         shift
-        log_color $color "$@" >&2
+        log_color $color_name "$@" >&2
     fi
 }
 
