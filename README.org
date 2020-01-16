@@ -24,6 +24,7 @@ The script can run Emacs with the developer's local Emacs configuration, or with
   -  [[#script][Script]]
   -  [[#github-action][GitHub Action]]
   -  [[#git-pre-push-hook][git pre-push hook]]
+-  [[#comparisons][Comparisons]]
 -  [[#changelog][Changelog]]
 
 * Screenshots
@@ -185,6 +186,63 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 
   make test
 #+END_SRC
+
+* Comparisons
+:PROPERTIES:
+:TOC:      ignore-children
+:END:
+
+There are several similar tools, each of which is slightly different.
+
+*Notes:*
++  In these comparisons, =makem.sh='s Makefile is not included, because it only provides an alternative, =make=-style calling convention; it provides no functionality.
++  These notes were compiled by reading these projects' documentation and source code, but the author is not an expert on these tools.  Corrections are welcome.
+
+** [[https://github.com/cask/cask][Cask]]
+
+Cask is a classic Emacs package project management tool.  It's powerful and well-documented.  It's much more sophisticated than =makem.sh=.
+
++  Cask requires configuration and initialization for each project before use.  =makem.sh= is designed to work without initialization or configuration.
++  Cask maintains a project-local Emacs configuration for building and testing.  =makem.sh= provides similar, optional sandboxing to install dependencies separately from the developer's Emacs configuration.
++  Cask is intended to be installed by using =curl= to download a script which is piped to Python.  This is a dangerous, insecure anti-pattern, compounded by the size of the code.  =makem.sh= is intended to be copied into place by the package developer, and its code is easy to inspect.
++  Cask is intended to be installed locally on each developer's machine.  =makem.sh= is intended to be dropped in to a package's repo, requiring no local installation.
++  Cask's documentation is extensive and well-presented on [[https://cask.readthedocs.io/en/latest/][its Web site]].  =makem.sh= can be used by reading a standard =--help= usage guide.
++  Cask is over 3,000 lines of Emacs Lisp and Python code.  =makem.sh= is about 600 lines of very simple code in one file.
+
+** [[https://github.com/doublep/eldev][Eldev]]
+
+Eldev is a powerful, flexible tool.  It has many features and can be extended and configured for each project.  It's designed to be much more sophisticated than =makem.sh=.
+
++  Eldev expects (though it does not strictly require) some initialization and configuration for each project before use.  =makem.sh= is designed to work without initialization or configuration.
++  Eldev appears to use the developer's local Emacs configuration for installing package dependencies (it is difficult to discern exactly how this works from the documentation).  =makem.sh= has built-in, optional sandboxing to install dependencies separately from the developer's Emacs configuration.
++  Eldev is intended to be installed by using =curl= to download a script which is piped to a shell.  This is a dangerous, insecure anti-pattern, compounded by the size of the code.  =makem.sh= is intended to be copied into place by the package developer, and its code is easy to inspect.
++  Eldev is intended to be installed locally on each developer's machine.  =makem.sh= is intended to be dropped in to a package's repo, requiring no local installation.
++  Eldev's documentation is comprehensive and well-written, and it's about 8,000 words.  =makem.sh= can be used by reading a standard =--help= usage guide.
++  Eldev runs from within Emacs, within the same process as the operations being run (such as testing).  =makem.sh= runs outside of Emacs, and each operation is run in a separate Emacs process.
++  Eldev is over 4,000 lines of dense code across 8 source files.  =makem.sh= is about 600 lines of very simple code in one file.
+
+** [[https://github.com/vermiculus/emake.el][emake]]
+
+=emake= is intended for continuous integration testing.  It is powerful and well-documented, and provides some more specific flexibility than =makem.sh=.
+
++  =emake= requires that a variety of project-specific, Emacs-specific variables be configured before use.  =makem.sh= is designed to work without initialization or configuration.
++  It appears that =emake= may be run locally rather than only on remote systems like Travis CI or GitHub Actions, but that extensive configuration and initialization is required.  =makem.sh= is designed to be equally simple to use for both local developer systems and remote CI testing.
++  =emake= provides some tools for building Emacs versions locally and on CI systems.  =makem.sh= itself uses only the locally installed version of Emacs; a GitHub Actions configuration is provided that uses other tools to install Emacs versions on CI systems.
++  =emake= is intended to be installed by using =curl= to download a script which is piped to a shell, and it appears to make further use of downloading remote shell scripts at runtime, at least for initialization.  This is a dangerous, insecure anti-pattern.  =makem.sh= is intended to be copied into place by the package developer, and its code is easy to inspect.  No remote code is downloaded, other than installing Emacs package dependencies when requested.
++  =emake='s documentation is comprehensive and well-written, and it's about 2,000 words.  =makem.sh= can be used by reading a standard =--help= usage guide.
++  =emake= is a 700-line Emacs Lisp file, with an optional 100-line Makefile that provides some default configuration.  =makem.sh= is about 600 lines of Bash code in one file.
+
+** [[https://gitlab.petton.fr/DamienCassou/makel/][makel]]
+
+Of these alternatives, =makel= is most like =makem.sh=.  It's simple and requires little configuration.
+
++  =makel= requires configuring several variables before use.  =makem.sh= is designed to work without initialization or configuration.
++  =makel= can install package dependencies which are manually specified, and it appears to download them into the local package repo directory.  =makem.sh= only installs dependencies into a sandbox directory, which, by default, is a temporary directory that is automatically removed.
++  =makel= can be used on remote CI systems, but no specific integration tools are provided.  =makem.sh= provides a GitHub Actions file that can be used as-is.
++  =makel= is intended to be used by copying two Make files into the project repo directory.  It recommends allowing one of them to download the other automatically from the Internet when not present.  =makem.sh= is intended to be copied into place by the package developer.  No remote code is downloaded, other than installing Emacs package dependencies when requested.
++  =makel= provides no built-in documentation, but it is very simple to use.  =makem.sh= can be used by reading a standard =--help= usage guide.
++  =makel= is about 150 lines of Make code in one file.  =makem.sh= is about 600 lines of Bash code in one file.
+
 * Changelog
 :PROPERTIES:
 :TOC:      0
