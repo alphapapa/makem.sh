@@ -151,11 +151,11 @@ function command-output {
         eval "$@"
     )
 }
-function should-command-contain {
+function should-function-contain {
     local command="$1"
     shift
 
-    verbose 1 "$command should contain: $@"
+    verbose 1 "Should contain: $command: $@"
     haystack-has-needles-p "$(command-output "$command")" "$@" \
         && success "Does contain." \
             || error "Does not contain."
@@ -170,7 +170,7 @@ function haystack-has-needles-p {
     done
 }
 
-function should-command {
+function should-function {
     # Ensure makem command $@ returns 0.
     verbose 1 "Should command: $@..."
 
@@ -188,7 +188,7 @@ function should-command {
         && success "Command did: $@" \
             || error "Command did not: $@"
 }
-function should-not-command {
+function should-not-function {
     # Ensure makem command $@ does not return 0.
     verbose 1 "Should NOT command: $@..."
 
@@ -207,7 +207,7 @@ function should-not-command {
             || error "Command did: $@"
 }
 
-function should-command-output {
+function should-function-output {
     verbose 1 "Should output of command: $@"
     debug "Running: $makem $@"
 
@@ -223,7 +223,7 @@ function should-command-output {
             || error "No output for command: $@"
 
 }
-function should-not-command-output {
+function should-not-function-output {
     verbose 1 "Should NOT output of command: $@"
     debug "Running: $makem $@"
 
@@ -292,11 +292,11 @@ function test-empty-project {
         verbose 1 "Running empty project tests..."
         cd "$dir_empty_project" || die
 
-        should-not-command buttercup-tests-p
-        should-not-command ert-tests-p
+        should-not-function buttercup-tests-p
+        should-not-function ert-tests-p
 
-        should-not-command-output dependencies
-        should-not-command-output files-project-test
+        should-not-function-output dependencies
+        should-not-function-output files-project-test
 
         should-not-rule test-buttercup
         should-not-rule test-ert
@@ -307,22 +307,22 @@ function test-example-project {
         verbose 1 "Running example project tests..."
         cd "$(dirname "$0")"/../example-package || die "Unable to enter example-package directory."
 
-        should-command-output dependencies
-        should-command-output files-project-test
+        should-function-output dependencies
+        should-function-output files-project-test
 
-        should-command buttercup-tests-p
-        should-command ert-tests-p
+        should-function buttercup-tests-p
+        should-function ert-tests-p
 
-        should-command-contain dependencies buttercup dash
+        should-function-contain dependencies buttercup dash
 
-        should-command ensure-tests-available Buttercup t
+        should-function ensure-tests-available Buttercup t
 
         should-rule compile
         should-rule test-buttercup
         should-rule test-ert
 
 
-        #  should-command lint-checkdoc
+        #  should-function lint-checkdoc
     )
 }
 
