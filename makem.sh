@@ -48,16 +48,20 @@ function usage {
     cat <<EOF
 $0 [OPTIONS] RULES...
 
+Linter- and test-specific rules will error when their linters or tests
+are not found.  With -vv, rules that run multiple rules will show a
+message for unavailable linters or tests.
+
 Rules:
   all      Run all lints and tests.
   compile  Byte-compile source files.
 
-  lint           Run all lints.
+  lint           Run all linters, ignoring unavailable ones.
   lint-checkdoc  Run checkdoc.
   lint-compile   Byte-compile source files with warnings as errors.
   lint-package   Run package-lint.
 
-  test, tests     Run all tests.
+  test, tests     Run all tests, ignoring missing test types.
   test-buttercup  Run Buttercup tests.
   test-ert        Run ERT tests.
 
@@ -368,6 +372,52 @@ function cleanup {
     done
 }
 
+function echo-unset-p {
+    # Echo 0 if $1 is set, otherwise 1.  IOW, this returns the exit
+    # code of [[ $1 ]] as STDOUT.
+    [[ $1 ]]
+    echo $?
+}
+
+function ensure-package-available {
+    # If package $1 is available, return 0.  Otherwise, return 1, and
+    # if $2 is set, give error otherwise verbose.  Outputting messages
+    # here avoids repetition in callers.
+    local package=$1
+    local direct_p=$2
+
+    if ! run_emacs --load $package &>/dev/null
+    then
+        if [[ $direct_p ]]
+        then
+            error "$package not available."
+        else
+            verbose 2 "$package not available."
+        fi
+        return 1
+    fi
+}
+
+function ensure-tests-available {
+    # If tests of type $1 (like "ERT") are available, return 0.  Otherwise, if
+    # $2 is set, give an error and return 1; otherwise give verbose message.  $1
+    # should have a corresponding predicate command, like ert-tests-p for ERT.
+    local test_name=$1
+    local test_command="${test_name,,}-tests-p"  # Converts name to lowercase.
+    local direct_p=$2
+
+    if ! $test_command
+    then
+        if [[ $direct_p ]]
+        then
+            error "$test_name tests not found."
+        else
+            verbose 2 "$test_name tests not found."
+        fi
+        return 1
+    fi
+}
+
 function echo_color {
     # This allows bold, italic, etc. without needing a function for
     # each variation.
@@ -436,6 +486,9 @@ function ts {
 # * Rules
 
 # These functions are intended to be called as rules, like a Makefile.
+# Some rules test $1 to determine whether the rule is being called
+# directly or from a meta-rule; if directly, an error is given if the
+# rule can't be run, otherwise it's skipped.
 
 function all {
     verbose 1 "Running all rules..."
@@ -505,6 +558,8 @@ function lint-compile {
 }
 
 function lint-package {
+    ensure-package-available package-lint $1 || return $(echo-unset-p $1)
+
     verbose 1 "Linting package..."
 
     run_emacs \
@@ -523,7 +578,7 @@ function tests {
 }
 
 function test-buttercup {
-    buttercup-tests-p || return 0
+    ensure-tests-available Buttercup $1 || return $(echo-unset-p $1)
     compile || die
 
     verbose 1 "Running Buttercup tests..."
@@ -540,7 +595,7 @@ function test-buttercup {
 }
 
 function test-ert {
-    ert-tests-p || return 0
+    ensure-tests-available ERT $1 || return $(echo-unset-p $1)
     compile || die
 
     verbose 1 "Running ERT tests..."
@@ -726,7 +781,9 @@ do
         batch=true
     elif type -t "$rule" 2>/dev/null | grep function &>/dev/null
     then
-        $rule
+        # Pass called-directly as $1 to indicate that the rule is
+        # being called directly rather than from a meta-rule.
+        $rule called-directly
     elif [[ $rule = test ]]
     then
         # Allow the "tests" rule to be called as "test".  Since "test"

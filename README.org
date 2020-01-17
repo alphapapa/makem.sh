@@ -108,16 +108,20 @@ The script may be called directly to specify additional options.
 #+BEGIN_EXAMPLE
   makem.sh [OPTIONS] RULES...
 
+  Linter- and test-specific rules will error when their linters or tests
+  are not found.  With -vv, rules that run multiple rules will show a
+  message for unavailable linters or tests.
+
   Rules:
     all      Run all lints and tests.
     compile  Byte-compile source files.
 
-    lint           Run all lints.
+    lint           Run all linters, ignoring unavailable ones.
     lint-checkdoc  Run checkdoc.
     lint-compile   Byte-compile source files with warnings as errors.
     lint-package   Run package-lint.
 
-    test, tests     Run all tests.
+    test, tests     Run all tests, ignoring missing test types.
     test-buttercup  Run Buttercup tests.
     test-ert        Run ERT tests.
 
