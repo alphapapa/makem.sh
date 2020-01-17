@@ -219,8 +219,8 @@ Cask is a classic Emacs package project management tool.  It's powerful and well
 
 Eldev is a powerful, flexible tool.  It has many features and can be extended and configured for each project.  It's designed to be much more sophisticated than =makem.sh=.
 
-+  Eldev expects (though it does not strictly require) some initialization and configuration for each project before use.  =makem.sh= is designed to work without initialization or configuration.
-+  Eldev appears to use the developer's local Emacs configuration for installing package dependencies (it is difficult to discern exactly how this works from the documentation).  =makem.sh= has built-in, optional sandboxing to install dependencies separately from the developer's Emacs configuration.
++  Eldev requires some initialization and configuration for each project before use.  =makem.sh= is designed to work without initialization or configuration.
++  Eldev installs dependencies in an Emacs version-specific directory in the package repo, which allows testing with multiple Emacs versions.  =makem.sh= can either use dependencies that exist in the developer's local Emacs configuration, or it can use built-in sandboxing to install dependencies separately; it does not support separate, Emacs version-specific sandboxes.
 +  Eldev is intended to be installed by using =curl= to download a script which is piped to a shell.  This is a dangerous, insecure anti-pattern, compounded by the size of the code.  =makem.sh= is intended to be copied into place by the package developer, and its code is easy to inspect.
 +  Eldev is intended to be installed locally on each developer's machine.  =makem.sh= is intended to be dropped in to a package's repo, requiring no local installation.
 +  Eldev's documentation is comprehensive and well-written, and it's about 8,000 words.  =makem.sh= can be used by reading a standard =--help= usage guide.
