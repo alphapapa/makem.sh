@@ -92,13 +92,13 @@ A default =Makefile= is provided which calls the =makem.sh= script.  Call it wit
 
   # Run tests with emacs-sandbox.sh in a temporary sandbox and
   # automatically install dependencies.
-  $ make sandbox=t auto-install=t test
+  $ make sandbox=t install-deps=t test
 
   # Like previous, but use a permanent sandbox directory.  The developer
   # might choose to recreate it manually when necessary, leaving it in
   # place to save time otherwise.
   $ mkdir sandbox
-  $ make sandbox-dir=sandbox auto-install=t test
+  $ make sandbox-dir=sandbox install-deps=t test
 #+END_SRC
 
 ** Script
@@ -148,7 +148,7 @@ The script may be called directly to specify additional options.
                            directory (removing directory on exit).
     -S, --sandbox-dir DIR  Use DIR for the sandbox directory (leaving it
                            on exit).  Implies -s.
-    --auto-install         Automatically install package dependencies.
+    --install-deps         Automatically install package dependencies.
     --install-linters      Automatically install linters.
     -i, --install PACKAGE  Install PACKAGE before running rules.
 

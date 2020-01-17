@@ -84,13 +84,13 @@ Options:
   -C, --no-compile  Don't compile files automatically.
 
 Sandbox options:
-  -s, --sandbox           Run Emacs with an empty config in a temporary
-                          directory (removing directory on exit).
-  -S, --sandbox-dir DIR   Use DIR for the sandbox directory (leaving it
-                          on exit).  Implies -s.
-  --auto-install          Automatically install package dependencies.
-  --install-linters  Automatically install linters.
-  -i, --install PACKAGE   Install PACKAGE before running rules.
+  -s, --sandbox          Run Emacs with an empty config in a temporary
+                         directory (removing directory on exit).
+  -S, --sandbox-dir DIR  Use DIR for the sandbox directory (leaving it
+                         on exit).  Implies -s.
+  --install-deps         Automatically install package dependencies.
+  --install-linters      Automatically install linters.
+  -i, --install PACKAGE  Install PACKAGE before running rules.
 
 Source files are automatically discovered from git, or may be
 specified with options.  Package dependencies are discovered from
@@ -328,7 +328,7 @@ function sandbox {
     )
 
     # Add package-install arguments for dependencies.
-    if [[ $auto_install ]]
+    if [[ $install_deps ]]
     then
         local deps=($(dependencies))
         debug "Installing dependencies: ${deps[@]}"
@@ -521,7 +521,7 @@ function batch {
 }
 
 function interactive {
-    # Run Emacs interactively.  Most useful with --sandbox and --auto-install.
+    # Run Emacs interactively.  Most useful with --sandbox and --install-deps.
     unset arg_batch
     run_emacs \
         $(args-load-files "${files_project_source[@]}" "${files_project_test[@]}")
@@ -715,7 +715,7 @@ files_project_byte_compile=("${files_project_source[@]}" "${files_project_test[@
 
 args=$(getopt -n "$0" \
               -o dhi:sS:vf:CO \
-              -l auto-install,install-linters,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-org-repo,sandbox,sandbox-dir: \
+              -l install-deps,install-linters,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-org-repo,sandbox,sandbox-dir: \
               -- "$@") \
     || { usage; exit 1; }
 eval set -- "$args"
@@ -723,8 +723,8 @@ eval set -- "$args"
 while true
 do
     case "$1" in
-        --auto-install)
-            auto_install=true
+        --install-deps)
+            install_deps=true
             ;;
         --install-linters)
             args_sandbox_package_install+=(--eval "(package-install 'indent-lint)"
