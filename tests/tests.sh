@@ -141,7 +141,7 @@ function init-fail-project {
 
 # ** Testing
 
-function command-output {
+function function-output {
     debug "Running: $makem $@"
     (
         debug=$makem_debug
@@ -152,11 +152,11 @@ function command-output {
     )
 }
 function should-function-contain {
-    local command="$1"
+    local function="$1"
     shift
 
-    verbose 1 "Should contain: $command: $@"
-    haystack-has-needles-p "$(command-output "$command")" "$@" \
+    verbose 1 "Should contain: $function: $@"
+    haystack-has-needles-p "$(function-output "$function")" "$@" \
         && success "Does contain." \
             || error "Does not contain."
 }
