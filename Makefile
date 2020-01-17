@@ -14,6 +14,9 @@
 ifdef auto-install
 	AUTO_INSTALL = "--auto-install"
 endif
+ifdef install-linters
+	INSTALL_LINTERS = "--install-linters"
+endif
 
 ifdef sandbox
 	SANDBOX = "--sandbox"
@@ -46,4 +49,4 @@ endif
 # directory by that name exists, which can confuse Make.
 
 %:
-	@./makem.sh $(DEBUG) $(VERBOSE) $(SANDBOX) $(SANDBOX_DIR) $(AUTO_INSTALL) $(@)
+	@./makem.sh $(DEBUG) $(VERBOSE) $(SANDBOX) $(SANDBOX_DIR) $(AUTO_INSTALL) $(INSTALL_LINTERS) $(@)

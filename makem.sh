@@ -84,12 +84,13 @@ Options:
   -C, --no-compile  Don't compile files automatically.
 
 Sandbox options:
-  -s, --sandbox          Run Emacs with an empty config in a temporary
-                         directory (removing directory on exit).
-  -S, --sandbox-dir DIR  Use DIR for the sandbox directory (leaving it
-                         on exit).  Implies -s.
-  --auto-install         Automatically install package dependencies.
-  -i, --install PACKAGE  Install PACKAGE before running rules.
+  -s, --sandbox           Run Emacs with an empty config in a temporary
+                          directory (removing directory on exit).
+  -S, --sandbox-dir DIR   Use DIR for the sandbox directory (leaving it
+                          on exit).  Implies -s.
+  --auto-install          Automatically install package dependencies.
+  --install-linters  Automatically install linters.
+  -i, --install PACKAGE   Install PACKAGE before running rules.
 
 Source files are automatically discovered from git, or may be
 specified with options.  Package dependencies are discovered from
@@ -714,7 +715,7 @@ files_project_byte_compile=("${files_project_source[@]}" "${files_project_test[@
 
 args=$(getopt -n "$0" \
               -o dhi:sS:vf:CO \
-              -l auto-install,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-org-repo,sandbox,sandbox-dir: \
+              -l auto-install,install-linters,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-org-repo,sandbox,sandbox-dir: \
               -- "$@") \
     || { usage; exit 1; }
 eval set -- "$args"
@@ -724,6 +725,10 @@ do
     case "$1" in
         --auto-install)
             auto_install=true
+            ;;
+        --install-linters)
+            args_sandbox_package_install+=(--eval "(package-install 'indent-lint)"
+                                           --eval "(package-install 'package-lint)")
             ;;
         -d|--debug)
             debug=true
