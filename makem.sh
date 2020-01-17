@@ -171,7 +171,7 @@ function run_emacs {
         "${emacs_command[@]}"
         -Q
         "${args_sandbox[@]}"
-        -l $package_initialize_file
+        -l "$package_initialize_file"
         $arg_batch
         -L "$load_path"
     )
@@ -181,7 +181,7 @@ function run_emacs {
         && debug $("${emacs_command[@]}" \
                        --batch \
                        --eval "(message \"LOAD-PATH: %s\" load-path)" \
-                    2>&1)
+                       2>&1)
 
     # Set output file.
     output_file=$(mktemp) || die "Unable to make output file."
@@ -216,6 +216,14 @@ function batch-byte-compile {
 }
 
 # ** Files
+
+function discover-files {
+    debug "Discovering files..."
+
+    files_project_source+=($(files-project-source))
+    files_project_test+=($(files-project-test))
+    files_project_byte_compile+=("${files_project_source[@]}" "${files_project_test[@]}")
+}
 
 function files-project-elisp {
     # Echo list of Elisp files in project.
@@ -257,7 +265,8 @@ function args-load-files {
 
 function test-files-p {
     # Return 0 if $files_project_test is non-empty.
-    [[ "${files_project_test[@]}" ]]
+
+    [[ $(files-project-test) ]]
 }
 
 function buttercup-tests-p {
@@ -265,7 +274,7 @@ function buttercup-tests-p {
     test-files-p || die "No tests found."
     debug "Checking for Buttercup tests..."
 
-    grep "(require 'buttercup)" "${files_project_test[@]}" &>/dev/null
+    grep "(require 'buttercup)" $(files-project-test) &>/dev/null
 }
 
 function ert-tests-p {
@@ -276,7 +285,7 @@ function ert-tests-p {
     # We check for this rather than "(require 'ert)", because ERT may
     # already be loaded in Emacs and might not be loaded with
     # "require" in a test file.
-    grep "(ert-deftest" "${files_project_test[@]}" &>/dev/null
+    grep "(ert-deftest" $(files-project-test) &>/dev/null
 }
 
 function dependencies {
@@ -642,6 +651,7 @@ function test-ert {
 
 test_files_regexp='^((tests?|t)/)|-test.el$|^test-'
 
+discover=true
 emacs_command=("emacs")
 errors=0
 verbose=0
@@ -703,139 +713,158 @@ args_package_init=(
 
 elisp_org_package_archive="(add-to-list 'package-archives '(\"org\" . \"https://orgmode.org/elpa/\") t)"
 
-# * Project files
-
-# MAYBE: Option to not byte-compile test files.  (OTOH, byte-compiling reveals many
-# errors that would otherwise go unnoticed, so it's worth it to fix the warnings.)
-files_project_source=($(files-project-source))
-files_project_test=($(files-project-test))
-files_project_byte_compile=("${files_project_source[@]}" "${files_project_test[@]}")
-
 # * Args
 
-args=$(getopt -n "$0" \
-              -o dhi:sS:vf:CO \
-              -l install-deps,install-linters,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-org-repo,sandbox,sandbox-dir: \
-              -- "$@") \
-    || { usage; exit 1; }
-eval set -- "$args"
+function args {
+    args=$(getopt -n "$0" \
+                  -o dhi:NsS:vf:CO \
+                  -l install-deps,install-linters,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-discover,no-org-repo,sandbox,sandbox-dir: \
+                  -- "$@") \
+        || { usage; exit 1; }
+    eval set -- "$args"
 
-while true
-do
-    case "$1" in
-        --install-deps)
-            install_deps=true
-            ;;
-        --install-linters)
-            args_sandbox_package_install+=(--eval "(package-install 'indent-lint)"
-                                           --eval "(package-install 'package-lint)")
-            ;;
-        -d|--debug)
-            debug=true
-            verbose=2
-            ;;
-        --debug-load-path)
-            debug_load_path=true
-            ;;
-        -h|--help)
-            usage
-            exit
-            ;;
-        -i|--install)
-            shift
-            args_sandbox_package_install+=(--eval "(package-install '$1)")
-            ;;
-        -s|--sandbox)
-            sandbox=true
-            ;;
-        -S|--sandbox-dir)
-            shift
-            sandbox=true
-            sandbox_dir="$1"
-            ;;
-        -v|--verbose)
-            ((verbose++))
-            ;;
-        -f|--file)
-            shift
-            project_source_files+=("$1")
-            project_byte_compile_files+=("$1")
-            ;;
-        -O|--no-org-repo)
-            unset elisp_org_package_archive
-            ;;
-        --no-color)
-            unset color
-            ;;
-        -C|--no-compile)
-            unset compile
-            ;;
-        --)
-            # Remaining args (required; do not remove)
-            shift
-            rest=("$@")
-            break
-            ;;
-    esac
+    while true
+    do
+        case "$1" in
+            --install-deps)
+                install_deps=true
+                ;;
+            --install-linters)
+                args_sandbox_package_install+=(--eval "(package-install 'indent-lint)"
+                                               --eval "(package-install 'package-lint)")
+                ;;
+            -d|--debug)
+                debug=true
+                verbose=2
+                ;;
+            --debug-load-path)
+                debug_load_path=true
+                ;;
+            -h|--help)
+                usage
+                exit
+                ;;
+            -i|--install)
+                shift
+                args_sandbox_package_install+=(--eval "(package-install '$1)")
+                ;;
+            -N|--no-discover)
+                unset discover
+                ;;
+            -s|--sandbox)
+                sandbox=true
+                ;;
+            -S|--sandbox-dir)
+                shift
+                sandbox=true
+                sandbox_dir="$1"
+                ;;
+            -v|--verbose)
+                ((verbose++))
+                ;;
+            -f|--file)
+                shift
+                project_source_files+=("$1")
+                project_byte_compile_files+=("$1")
+                ;;
+            -O|--no-org-repo)
+                unset elisp_org_package_archive
+                ;;
+            --no-color)
+                unset color
+                ;;
+            -C|--no-compile)
+                unset compile
+                ;;
+            --)
+                # Remaining args (required; do not remove)
+                shift
+                rest=("$@")
+                break
+                ;;
+        esac
 
-    shift
-done
+        shift
+    done
 
-debug "ARGS: $args"
-debug "Remaining args: ${rest[@]}"
-
-# Set package elisp (which depends on --no-org-repo arg).
-package_initialize_file="$(elisp-package-initialize-file)"
-paths_temp+=("$package_initialize_file")
+    debug "ARGS: $args"
+    debug "Remaining args: ${rest[@]}"
+}
 
 # * Main
 
-trap cleanup EXIT INT TERM
+function main {
+    args "$@"
 
-if ! [[ ${files_project_source[@]} ]]
-then
-    error "No files specified and not in a git repo."
-    exit 1
-fi
+    trap cleanup EXIT INT TERM
 
-# Initialize sandbox.
-[[ $sandbox ]] && sandbox
+    # Set package elisp (which depends on --no-org-repo arg).
+    package_initialize_file="$(elisp-package-initialize-file)"
+    paths_temp+=("$package_initialize_file")
 
-# Run rules.
-for rule in "${rest[@]}"
-do
-    if [[ $batch ]]
-    then
-        debug "Adding batch argument: $rule"
-        args_batch+=("$rule")
+    # MAYBE: Option to not byte-compile test files.  OTOH, byte-compiling reveals many
+    # errors that would otherwise go unnoticed, so it's worth it to fix the warnings.
 
-    elif [[ $rule = batch ]]
+    # Discover project files.
+    if [[ $discover ]]
     then
-        # Remaining arguments are passed to Emacs.
-        batch=true
-    elif type -t "$rule" 2>/dev/null | grep function &>/dev/null
-    then
-        # Pass called-directly as $1 to indicate that the rule is
-        # being called directly rather than from a meta-rule.
-        $rule called-directly
-    elif [[ $rule = test ]]
-    then
-        # Allow the "tests" rule to be called as "test".  Since "test"
-        # is a shell builtin, this workaround is required.
-        tests
-    else
-        error "Invalid rule: $rule"
+        discover-files
     fi
-done
 
-# The batch rule.
-[[ $batch ]] && batch
+    # echo PWD: $(pwd)
+    # echo "ARGH: $(git ls-files 2>/dev/null | egrep "\.el$" | filter-files-exclude)"
+    # echo ELISP: "$(files-project-elisp)"
+    # echo SOURCE: "$(files-project-source)"
+    # # exit
 
-if [[ $errors -gt 0 ]]
-then
-    log_color red "Finished with $errors errors."
-else
-    success "Finished without errors."
-fi
+    if ! [[ ${files_project_source[@]} ]]
+    then
+        error "No project files found, and none specified with -f."
+        exit 1
+    fi
 
-exit $errors
+    # Initialize sandbox.
+    [[ $sandbox ]] && sandbox
+
+    # Run rules.
+    for rule in "${rest[@]}"
+    do
+        if [[ $batch ]]
+        then
+            debug "Adding batch argument: $rule"
+            args_batch+=("$rule")
+
+        elif [[ $rule = batch ]]
+        then
+            # Remaining arguments are passed to Emacs.
+            batch=true
+        elif type -t "$rule" 2>/dev/null | grep function &>/dev/null
+        then
+            # Pass called-directly as $1 to indicate that the rule is
+            # being called directly rather than from a meta-rule.
+            $rule called-directly
+        elif [[ $rule = test ]]
+        then
+            # Allow the "tests" rule to be called as "test".  Since "test"
+            # is a shell builtin, this workaround is required.
+            tests
+        else
+            error "Invalid rule: $rule"
+        fi
+    done
+
+    # The batch rule.
+    [[ $batch ]] && batch
+
+    if [[ $errors -gt 0 ]]
+    then
+        log_color red "Finished with $errors errors."
+    else
+        success "Finished without errors."
+    fi
+
+    exit $errors
+}
+
+# Pretend this is Python.
+[[ $0 =~ makem\.sh$ ]] && main "$@"
