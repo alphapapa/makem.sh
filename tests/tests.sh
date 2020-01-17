@@ -128,15 +128,15 @@ function ts {
 
 # ** Projects
 
-function init-empty-project {
+function init-fail-project {
     (
-        cd "$dir_empty_project" || die
+        cd "$dir_fail_project" || die
         git init \
-            && echo "(provide 'empty)" >empty.el \
+            && echo -e "(cl-first '(0 1))\n(provide 'fail)" >fail.el \
             && git add .  \
             && git commit -m Initial
     ) &>/dev/null \
-        || die "Unable to initialize empty project."
+        || die "Unable to initialize fail project."
 }
 
 # ** Testing
@@ -213,8 +213,8 @@ function should-function-output {
 
     # Capture output from subshell.
     local output=$( (
-        source "$makem"
-        eval "$@" ) )
+                      source "$makem"
+                      eval "$@" ) )
 
     debug "Output for command $@: $output"
 
@@ -229,8 +229,8 @@ function should-not-function-output {
 
     # Capture output from subshell.
     local output=$( (
-        source "$makem"
-        eval "$@" ) )
+                      source "$makem"
+                      eval "$@" ) )
 
     debug "Output for command $@: $output"
 
@@ -280,50 +280,58 @@ function all {
 function tests {
     verbose 1 "Running all tests..."
 
-    test-empty-project
+    test-fail-project
     test-example-project
 }
 
-function test-empty-project {
-    (
-        # NOTE: The empty project does contain one Elisp file that provides one
-        # feature, because makem.sh immediately exits if no such file is found.
+function test-fail-project {
+    # NOTE: The fail project does contain one Elisp file that provides one
+    # feature, because makem.sh immediately exits if no such file is found.
 
-        verbose 1 "Running empty project tests..."
-        cd "$dir_empty_project" || die
+    verbose 1 "Running fail project tests..."
+    cd "$dir_fail_project" || die
 
-        should-not-function buttercup-tests-p
-        should-not-function ert-tests-p
+    should-function files-project-source
 
-        should-not-function-output dependencies
-        should-not-function-output files-project-test
+    should-not-function buttercup-tests-p
+    should-not-function ert-tests-p
 
-        should-not-rule test-buttercup
-        should-not-rule test-ert
-    )
+    should-not-function-output dependencies
+    should-not-function-output files-project-test
+
+    should-not-rule all
+
+    should-not-rule lint
+    should-not-rule lint-checkdoc
+    should-not-rule lint-compile
+    should-not-rule lint-indent
+    should-not-rule lint-package
+
+    should-not-rule tests
+    should-not-rule test-buttercup
+    should-not-rule test-ert
+
+    cd - &>/dev/null
 }
 function test-example-project {
-    (
-        verbose 1 "Running example project tests..."
-        cd "$(dirname "$0")"/../example-package || die "Unable to enter example-package directory."
+    verbose 1 "Running example project tests..."
+    cd "$(dirname "$0")"/../example-package || die "Unable to enter example-package directory."
 
-        should-function-output dependencies
-        should-function-output files-project-test
+    should-function-output dependencies
+    should-function-output files-project-test
 
-        should-function buttercup-tests-p
-        should-function ert-tests-p
+    should-function buttercup-tests-p
+    should-function ert-tests-p
 
-        should-function-contain dependencies buttercup dash
+    should-function-contain dependencies buttercup dash
 
-        should-function ensure-tests-available Buttercup t
+    should-function ensure-tests-available Buttercup t
 
-        should-rule compile
-        should-rule test-buttercup
-        should-rule test-ert
+    should-rule compile
+    should-rule test-buttercup
+    should-rule test-ert
 
-
-        #  should-function lint-checkdoc
-    )
+    cd - &>/dev/null
 }
 
 # * Colors
@@ -403,9 +411,9 @@ debug "Remaining args: ${rest[@]}"
 
 # * Main
 
-dir_empty_project=$(mktemp -d) || die "Unable to make temporary directory."
-paths_temp+=("$dir_empty_project")
-init-empty-project
+dir_fail_project=$(mktemp -d) || die "Unable to make temporary directory."
+paths_temp+=("$dir_fail_project")
+init-fail-project
 
 trap cleanup EXIT INT TERM
 
