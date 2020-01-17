@@ -59,6 +59,7 @@ Rules:
   lint           Run all linters, ignoring unavailable ones.
   lint-checkdoc  Run checkdoc.
   lint-compile   Byte-compile source files with warnings as errors.
+  lint-indent    Run indent-lint.
   lint-package   Run package-lint.
 
   test, tests     Run all tests, ignoring missing test types.
@@ -531,6 +532,7 @@ function lint {
 
     lint-checkdoc
     lint-compile
+    lint-indent
     lint-package
 }
 
@@ -555,6 +557,33 @@ function lint-compile {
         && success "Linting compilation finished without errors." \
             || error "Linting compilation failed."
     unset compile_error_on_warn
+}
+
+function lint-indent {
+    ensure-package-available indent-lint $1 || return $(echo-unset-p $1)
+
+    verbose 1 "Linting indentation..."
+
+    # FIXME: indent-lint outputs a summary line like:
+    #    Diff finished (has differences).  Fri Jan 17 10:30:34 2020
+    # which is unnecessary for our use and clutters output.
+
+    # We load project source files as well, because they may contain
+    # macros with (declare (indent)) rules which must be loaded to set
+    # indentation.  However...
+
+    # FIXME: This doesn't appear to actually work: macros that set
+    # indentation and are correctly indented in the source files are
+    # reported as having wrong indentation.  Not sure if bug in
+    # indent-lint or here.
+
+    run_emacs \
+        --load indent-lint \
+        $(args-load-files "${files_project_source[@]}" "${files_project_test[@]}") \
+        --funcall indent-lint-batch \
+        "${files_project_source[@]}" "${files_project_test[@]}" \
+        && success "Linting indentation finished without errors." \
+            || error "Linting indentation failed."
 }
 
 function lint-package {

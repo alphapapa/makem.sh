@@ -119,6 +119,7 @@ The script may be called directly to specify additional options.
     lint           Run all linters, ignoring unavailable ones.
     lint-checkdoc  Run checkdoc.
     lint-compile   Byte-compile source files with warnings as errors.
+    lint-indent    Run indent-lint.
     lint-package   Run package-lint.
 
     test, tests     Run all tests, ignoring missing test types.
