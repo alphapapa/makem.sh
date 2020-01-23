@@ -143,6 +143,7 @@ function elisp-checkdoc-file {
     (when makem-checkdoc-errors-p
       (kill-emacs 1))))
 
+(setq checkdoc-spellcheck-documentation-flag t)
 (makem-checkdoc-files-and-exit)
 EOF
     echo $file
