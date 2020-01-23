@@ -62,6 +62,7 @@ Rules:
   lint-declare   Run check-declare.
   lint-indent    Run indent-lint.
   lint-package   Run package-lint.
+  lint-regexps   Run relint.
 
   test, tests     Run all tests, ignoring missing test types.
   test-buttercup  Run Buttercup tests.
@@ -619,6 +620,7 @@ function lint {
     lint-declare
     lint-indent
     lint-package
+    lint-regexps
 }
 
 function lint-checkdoc {
@@ -687,6 +689,19 @@ function lint-package {
         "${files_project_feature[@]}" \
         && success "Linting package finished without errors." \
             || error "Linting package failed."
+}
+
+function lint-regexps {
+    ensure-package-available relint $1 || return $(echo-unset-p $1)
+
+    verbose 1 "Linting regexps..."
+
+    run_emacs \
+        --load relint \
+        --funcall relint-batch \
+        "${files_project_source[@]}" \
+        && success "Linting regexps finished without errors." \
+            || error "Linting regexps failed."
 }
 
 function tests {
@@ -808,7 +823,8 @@ do
             ;;
         --install-linters)
             args_sandbox_package_install+=(--eval "(package-install 'indent-lint)"
-                                           --eval "(package-install 'package-lint)")
+                                           --eval "(package-install 'package-lint)"
+                                           --eval "(package-install 'relint)")
             ;;
         -d|--debug)
             debug=true
