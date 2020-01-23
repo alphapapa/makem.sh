@@ -174,7 +174,7 @@ function run_emacs {
         "${args_sandbox[@]}"
         -l $package_initialize_file
         $arg_batch
-        -L "$load_path"
+        "${args_load_paths[@]}"
     )
 
     # Show debug message with load-path from inside Emacs.
@@ -218,6 +218,12 @@ function batch-byte-compile {
 
 # ** Files
 
+function dirs-project {
+    # Echo list of directories to be used in load path.
+    files-project-source | dirnames
+    files-project-test | dirnames
+}
+
 function files-project-elisp {
     # Echo list of Elisp files in project.
     git ls-files 2>/dev/null | egrep "\.el$" | filter-files-exclude
@@ -231,6 +237,14 @@ function files-project-source {
 function files-project-test {
     # Echo list of Elisp test files.
     files-project-elisp | egrep "$test_files_regexp"
+}
+
+function dirnames {
+    # Echo directory names for files on STDIN.
+    while read file
+    do
+        dirname "$file"
+    done
 }
 
 function filter-files-exclude {
@@ -253,6 +267,14 @@ function args-load-files {
     for file in "$@"
     do
         printf -- '--load %q ' "$file"
+    done
+}
+
+function args-load-path {
+    # Echo load-path arguments.
+    for path in $(dirs-project | sort -u)
+    do
+        printf -- '-L %q ' "$path"
     done
 }
 
@@ -673,7 +695,7 @@ color=true
 # something, which seems like getting too smart for our own good.
 
 # TODO: Emit a warning if .ELC files that don't match any .EL files are detected.
-load_path="."
+args_load_paths=($(args-load-path))
 
 # ** Colors
 
