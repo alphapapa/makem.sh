@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # * makem.sh --- Script to aid building and testing Emacs Lisp packages
 
