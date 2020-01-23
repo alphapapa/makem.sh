@@ -78,7 +78,7 @@ Options:
 
   --debug-load-path  Print load-path from inside Emacs.
 
-  -f FILE, --file FILE  Check FILE in addition to discovered files.
+  -f, --file FILE   Check FILE in addition to discovered files.
 
   --no-color        Disable color output.
   -C, --no-compile  Don't compile files automatically.
