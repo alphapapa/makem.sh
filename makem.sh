@@ -78,6 +78,7 @@ Options:
 
   --debug-load-path  Print load-path from inside Emacs.
 
+  -E, --emacs PATH  Run Emacs at PATH.
   -f, --file FILE   Check FILE in addition to discovered files.
 
   --no-color        Disable color output.
@@ -714,8 +715,8 @@ files_project_byte_compile=("${files_project_source[@]}" "${files_project_test[@
 # * Args
 
 args=$(getopt -n "$0" \
-              -o dhi:sS:vf:CO \
-              -l install-deps,install-linters,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-org-repo,sandbox,sandbox-dir: \
+              -o dhE:i:sS:vf:CO \
+              -l emacs:,install-deps,install-linters,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-org-repo,sandbox,sandbox-dir: \
               -- "$@") \
     || { usage; exit 1; }
 eval set -- "$args"
@@ -740,6 +741,10 @@ do
         -h|--help)
             usage
             exit
+            ;;
+        -E|--emacs)
+            shift
+            emacs_command=($1)
             ;;
         -i|--install)
             shift
