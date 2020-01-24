@@ -229,7 +229,7 @@ function run_emacs {
 # ** Compilation
 
 function batch-byte-compile {
-    debug "batch-byte-compile: ERROR-ON-WARN:$compile_error_on_warn  FILES:$@"
+    debug "batch-byte-compile: ERROR-ON-WARN:$compile_error_on_warn"
 
     [[ $compile_error_on_warn ]] && local error_on_warn=(--eval "(setq byte-compile-error-on-warn t)")
 
@@ -279,7 +279,6 @@ function filter-files-feature {
     # Read paths on STDIN and echo ones that (provide 'a-feature).
     while read path
     do
-        debug "PATH: $path"
         egrep "^\\(provide '" "$path" &>/dev/null \
             && echo "$path"
     done
@@ -864,7 +863,7 @@ fi
 
 # Set load path.
 args_load_paths=($(args-load-path))
-debug "Load path args: ${args_load_paths[@]}"
+debug "LOAD PATH ARGS: ${args_load_paths[@]}"
 
 # Initialize sandbox.
 [[ $sandbox ]] && sandbox
