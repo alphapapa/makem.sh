@@ -88,8 +88,10 @@ Options:
 Sandbox options:
   -s, --sandbox          Run Emacs with an empty config in a temporary
                          directory (removing directory on exit).
-  -S, --sandbox-dir DIR  Use DIR for the sandbox directory (leaving it
-                         on exit).  Implies -s.
+  -S, --sandbox-dir DIR  Use DIR for the sandbox directory (leaving it in-place
+                         on exit).  Implies -s.  An Emacs version-specific
+                         subdirectory is made automatically, which facilitates
+                         testing under multiple Emacs versions.
   --install-deps         Automatically install package dependencies.
   --install-linters      Automatically install linters.
   -i, --install PACKAGE  Install PACKAGE before running rules.
@@ -354,6 +356,13 @@ function sandbox {
     then
         # Directory given as argument: ensure it exists.
         [[ -d $sandbox_dir ]] || die "Directory doesn't exist: $sandbox_dir"
+
+        # Add Emacs version-specific subdirectory, creating if necessary.
+        sandbox_dir="$sandbox_dir/$(emacs-version)"
+        if ! [[ -d $sandbox_dir ]]
+        then
+            mkdir "$sandbox_dir" || die "Unable to make sandbox subdir: $sandbox_dir"
+        fi
     else
         # Not given: make temp directory, and delete it on exit.
         local sandbox_dir=$(mktemp -d) || die "Unable to make sandbox dir."
@@ -528,6 +537,11 @@ function verbose {
 
 function ts {
     date "+%Y-%m-%d %H:%M:%S"
+}
+
+function emacs-version {
+    # Echo Emacs version number.
+    run_emacs --eval "(princ emacs-version)" || die "Unable to get Emacs version."
 }
 
 # * Rules
