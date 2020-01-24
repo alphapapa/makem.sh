@@ -243,7 +243,7 @@ function batch-byte-compile {
 
 function dirs-project {
     # Echo list of directories to be used in load path.
-    files-project-source | dirnames
+    files-project-feature | dirnames
     files-project-test | dirnames
 }
 
@@ -252,8 +252,8 @@ function files-project-elisp {
     git ls-files 2>/dev/null | egrep "\.el$" | filter-files-exclude
 }
 
-function files-project-source {
-    # Echo list of Elisp files that are not tests.
+function files-project-feature {
+    # Echo list of Elisp files that are not tests and provide a feature.
     files-project-elisp | egrep -v "$test_files_regexp" | filter-files-feature
 }
 
@@ -329,7 +329,7 @@ function dependencies {
     # Echo list of package dependencies.
 
     # Search package headers.
-    egrep '^;; Package-Requires: ' $(files-project-source) $(files-project-test) \
+    egrep '^;; Package-Requires: ' $(files-project-feature) $(files-project-test) \
         | egrep -o '\([^([:space:]][^)]*\)' \
         | egrep -o '^[^[:space:])]+' \
         | sed -r 's/\(//g' \
@@ -574,7 +574,7 @@ function batch {
     verbose 1 "Executing Emacs with arguments: ${args_batch[@]}"
 
     run_emacs \
-        $(args-load-files "${files_project_source[@]}" "${files_project_test[@]}") \
+        $(args-load-files "${files_project_feature[@]}" "${files_project_test[@]}") \
         "${args_batch[@]}"
 }
 
@@ -582,7 +582,7 @@ function interactive {
     # Run Emacs interactively.  Most useful with --sandbox and --install-deps.
     unset arg_batch
     run_emacs \
-        $(args-load-files "${files_project_source[@]}" "${files_project_test[@]}")
+        $(args-load-files "${files_project_feature[@]}" "${files_project_test[@]}")
     arg_batch="--batch"
 }
 
@@ -604,7 +604,7 @@ function lint-checkdoc {
 
     run_emacs \
         --load="$checkdoc_file" \
-        "${files_project_source[@]}" \
+        "${files_project_feature[@]}" \
         && success "Linting checkdoc finished without errors." \
             || error "Linting checkdoc failed."
 }
@@ -628,7 +628,7 @@ function lint-declare {
     run_emacs \
         --load "$check_declare_file" \
         -f makem-check-declare-files-and-exit \
-        "${files_project_source[@]}" \
+        "${files_project_feature[@]}" \
         && success "Linting declarations finished without errors." \
             || error "Linting declarations failed."
 }
@@ -644,9 +644,9 @@ function lint-indent {
 
     run_emacs \
         --load indent-lint \
-        $(args-load-files "${files_project_source[@]}" "${files_project_test[@]}") \
+        $(args-load-files "${files_project_feature[@]}" "${files_project_test[@]}") \
         --funcall indent-lint-batch \
-        "${files_project_source[@]}" "${files_project_test[@]}" \
+        "${files_project_feature[@]}" "${files_project_test[@]}" \
         && success "Linting indentation finished without errors." \
             || error "Linting indentation failed."
 }
@@ -659,7 +659,7 @@ function lint-package {
     run_emacs \
         --load package-lint \
         --funcall package-lint-batch-and-exit \
-        "${files_project_source[@]}" \
+        "${files_project_feature[@]}" \
         && success "Linting package finished without errors." \
             || error "Linting package failed."
 }
@@ -852,11 +852,11 @@ paths_temp+=("$package_initialize_file")
 trap cleanup EXIT INT TERM
 
 # Discover project files.
-files_project_source=($(files-project-source))
+files_project_feature=($(files-project-feature))
 files_project_test=($(files-project-test))
-files_project_byte_compile=("${files_project_source[@]}" "${files_project_test[@]}")
+files_project_byte_compile=("${files_project_feature[@]}" "${files_project_test[@]}")
 
-if ! [[ ${files_project_source[@]} ]]
+if ! [[ ${files_project_feature[@]} ]]
 then
     error "No files specified and not in a git repo."
     exit 1
