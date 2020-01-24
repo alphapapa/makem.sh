@@ -625,18 +625,9 @@ function lint-indent {
 
     verbose 1 "Linting indentation..."
 
-    # FIXME: indent-lint outputs a summary line like:
-    #    Diff finished (has differences).  Fri Jan 17 10:30:34 2020
-    # which is unnecessary for our use and clutters output.
-
     # We load project source files as well, because they may contain
     # macros with (declare (indent)) rules which must be loaded to set
-    # indentation.  However...
-
-    # FIXME: This doesn't appear to actually work: macros that set
-    # indentation and are correctly indented in the source files are
-    # reported as having wrong indentation.  Not sure if bug in
-    # indent-lint or here.
+    # indentation.
 
     run_emacs \
         --load indent-lint \
