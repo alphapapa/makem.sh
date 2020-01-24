@@ -109,7 +109,9 @@ The script may be called directly to specify additional options.
     --debug-load-path  Print load-path from inside Emacs.
 
     -E, --emacs PATH  Run Emacs at PATH.
-    -f, --file FILE   Check FILE in addition to discovered files.
+
+    -e, --exclude FILE  Exclude FILE from linting and testing.
+    -f, --file FILE     Check FILE in addition to discovered files.
 
     --no-color        Disable color output.
     -C, --no-compile  Don't compile files automatically.

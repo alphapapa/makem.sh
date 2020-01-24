@@ -80,7 +80,9 @@ Options:
   --debug-load-path  Print load-path from inside Emacs.
 
   -E, --emacs PATH  Run Emacs at PATH.
-  -f, --file FILE   Check FILE in addition to discovered files.
+
+  -e, --exclude FILE  Exclude FILE from linting and testing.
+  -f, --file FILE     Check FILE in addition to discovered files.
 
   --no-color        Disable color output.
   -C, --no-compile  Don't compile files automatically.
@@ -249,12 +251,17 @@ function dirs-project {
 
 function files-project-elisp {
     # Echo list of Elisp files in project.
-    git ls-files 2>/dev/null | egrep "\.el$" | filter-files-exclude
+    git ls-files 2>/dev/null \
+        | egrep "\.el$" \
+        | filter-files-exclude-default \
+        | filter-files-exclude-args
 }
 
 function files-project-feature {
     # Echo list of Elisp files that are not tests and provide a feature.
-    files-project-elisp | egrep -v "$test_files_regexp" | filter-files-feature
+    files-project-elisp \
+        | egrep -v "$test_files_regexp" \
+        | filter-files-feature
 }
 
 function files-project-test {
@@ -270,9 +277,28 @@ function dirnames {
     done
 }
 
-function filter-files-exclude {
+function filter-files-exclude-default {
     # Filter out paths (STDIN) which should be excluded by default.
     egrep -v "(/\.cask/|-autoloads.el|.dir-locals)"
+}
+
+function filter-files-exclude-args {
+    # Filter out paths (STDIN) which are excluded with --exclude.
+    if [[ ${files_exclude[@]} ]]
+    then
+        (
+            # We use a subshell to set IFS temporarily so we can send
+            # the list of files to grep -F.  This is ugly but more
+            # correct than replacing spaces with line breaks.  Note
+            # that, for some reason, using IFS="\n" or IFS='\n' doesn't
+            # work, and a literal line break seems to be required.
+            IFS="
+"
+            grep -Fv "${files_exclude[*]}"
+        )
+    else
+        cat
+    fi
 }
 
 function filter-files-feature {
@@ -768,8 +794,8 @@ elisp_org_package_archive="(add-to-list 'package-archives '(\"org\" . \"https://
 # * Args
 
 args=$(getopt -n "$0" \
-              -o dhE:i:sS:vf:CO \
-              -l emacs:,install-deps,install-linters,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-org-repo,sandbox,sandbox-dir: \
+              -o dhe:E:i:sS:vf:CO \
+              -l exclude:,emacs:,install-deps,install-linters,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-org-repo,sandbox,sandbox-dir: \
               -- "$@") \
     || { usage; exit 1; }
 eval set -- "$args"
@@ -813,6 +839,11 @@ do
             ;;
         -v|--verbose)
             ((verbose++))
+            ;;
+        -e|--exclude)
+            shift
+            debug "Excluding file: $1"
+            files_exclude+=("$1")
             ;;
         -f|--file)
             shift
