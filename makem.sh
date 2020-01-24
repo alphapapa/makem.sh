@@ -736,7 +736,6 @@ color=true
 # something, which seems like getting too smart for our own good.
 
 # TODO: Emit a warning if .ELC files that don't match any .EL files are detected.
-args_load_paths=($(args-load-path))
 
 # ** Colors
 
@@ -766,14 +765,6 @@ args_package_init=(
 )
 
 elisp_org_package_archive="(add-to-list 'package-archives '(\"org\" . \"https://orgmode.org/elpa/\") t)"
-
-# * Project files
-
-# MAYBE: Option to not byte-compile test files.  (OTOH, byte-compiling reveals many
-# errors that would otherwise go unnoticed, so it's worth it to fix the warnings.)
-files_project_source=($(files-project-source))
-files_project_test=($(files-project-test))
-files_project_byte_compile=("${files_project_source[@]}" "${files_project_test[@]}")
 
 # * Args
 
@@ -860,11 +851,20 @@ paths_temp+=("$package_initialize_file")
 
 trap cleanup EXIT INT TERM
 
+# Discover project files.
+files_project_source=($(files-project-source))
+files_project_test=($(files-project-test))
+files_project_byte_compile=("${files_project_source[@]}" "${files_project_test[@]}")
+
 if ! [[ ${files_project_source[@]} ]]
 then
     error "No files specified and not in a git repo."
     exit 1
 fi
+
+# Set load path.
+args_load_paths=($(args-load-path))
+debug "Load path args: ${args_load_paths[@]}"
 
 # Initialize sandbox.
 [[ $sandbox ]] && sandbox
