@@ -191,7 +191,7 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
   # testing in a clean config against the latest available dependency
   # versions is desired, one could use:
 
-  #   make sandbox=t autoinstall=t test
+  #   make sandbox=t install-deps=t test
 
   make test
 #+END_SRC
