@@ -20,8 +20,8 @@ The script can run Emacs with the developer's local Emacs configuration, or with
 :END:
 -  [[#installation][Installation]]
 -  [[#usage][Usage]]
-  -  [[#makefile][Makefile]]
   -  [[#script][Script]]
+  -  [[#makefile][Makefile]]
   -  [[#github-action][GitHub Action]]
   -  [[#git-pre-push-hook][git pre-push hook]]
 -  [[#comparisons][Comparisons]]
@@ -69,37 +69,6 @@ Copy =makem.sh= into your package's root directory.  Optionally, also copy =Make
 :END:
 
 The =makem.sh= script can be called directly or through a =Makefile=.  Use =makem.sh --help= to list available rules.
-
-** Makefile
-
-A default =Makefile= is provided which calls the =makem.sh= script.  Call it with the name of a rule and an optional verbosity level, like:
-
-#+BEGIN_SRC sh
-  # Run all rules.
-  $ make all
-
-  # Run all lints.
-  $ make lint
-
-  # Run all tests.
-  $ make test
-
-  # Run ERT tests with verbosity level 1.
-  $ make v=v test-ert
-
-  # Run Buttercup tests with verbosity level 2.
-  $ make v=vv test-buttercup
-
-  # Run tests with emacs-sandbox.sh in a temporary sandbox and
-  # automatically install dependencies.
-  $ make sandbox=t install-deps=t test
-
-  # Like previous, but use a permanent sandbox directory.  The developer
-  # might choose to recreate it manually when necessary, leaving it in
-  # place to save time otherwise.
-  $ mkdir sandbox
-  $ make sandbox-dir=sandbox install-deps=t test
-#+END_SRC
 
 ** Script
 
@@ -159,6 +128,37 @@ The script may be called directly to specify additional options.
   specified with options.  Package dependencies are discovered from
   "Package-Requires" headers in source files and from a Cask file.
 #+END_EXAMPLE
+
+** Makefile
+
+A default =Makefile= is provided which calls the =makem.sh= script.  Call it with the name of a rule and an optional verbosity level, like:
+
+#+BEGIN_SRC sh
+  # Run all rules.
+  $ make all
+
+  # Run all lints.
+  $ make lint
+
+  # Run all tests.
+  $ make test
+
+  # Run ERT tests with verbosity level 1.
+  $ make v=v test-ert
+
+  # Run Buttercup tests with verbosity level 2.
+  $ make v=vv test-buttercup
+
+  # Run tests with emacs-sandbox.sh in a temporary sandbox and
+  # automatically install dependencies.
+  $ make sandbox=t install-deps=t test
+
+  # Like previous, but use a permanent sandbox directory.  The developer
+  # might choose to recreate it manually when necessary, leaving it in
+  # place to save time otherwise.
+  $ mkdir sandbox
+  $ make sandbox-dir=sandbox install-deps=t test
+#+END_SRC
 
 ** GitHub Action
 
