@@ -886,6 +886,11 @@ files_project_feature=($(files-project-feature))
 files_project_test=($(files-project-test))
 files_project_byte_compile=("${files_project_feature[@]}" "${files_project_test[@]}")
 
+debug "EXCLUDING FILES: ${files_exclude[@]}"
+debug "FEATURE FILES: ${files_project_feature[@]}"
+debug "TEST FILES: ${files_project_test[@]}"
+debug "BYTE-COMPILE FILES: ${files_project_byte_compile[@]}"
+
 if ! [[ ${files_project_feature[@]} ]]
 then
     error "No files specified and not in a git repo."
