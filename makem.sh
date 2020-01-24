@@ -59,6 +59,7 @@ Rules:
   lint           Run all linters, ignoring unavailable ones.
   lint-checkdoc  Run checkdoc.
   lint-compile   Byte-compile source files with warnings as errors.
+  lint-declare   Run check-declare.
   lint-indent    Run indent-lint.
   lint-package   Run package-lint.
 
@@ -145,6 +146,26 @@ function elisp-checkdoc-file {
 
 (setq checkdoc-spellcheck-documentation-flag t)
 (makem-checkdoc-files-and-exit)
+EOF
+    echo $file
+}
+
+function elisp-check-declare-file {
+    # Since check-declare doesn't have a batch function that exits
+    # non-zero when errors are found, we make one.
+    local file=$(mktemp)
+
+    cat >$file <<EOF
+(require 'check-declare)
+
+(defun makem-check-declare-files-and-exit ()
+  "Run check-declare-files on files remaining on command line, exiting non-zero if there are warnings."
+  (let* ((files (mapcar #'expand-file-name command-line-args-left))
+         (errors (apply #'check-declare-files files)))
+    (when errors
+      (with-current-buffer check-declare-warning-buffer
+        (print (buffer-string)))
+      (kill-emacs 1))))
 EOF
     echo $file
 }
@@ -557,6 +578,7 @@ function lint {
 
     lint-checkdoc
     lint-compile
+    lint-declare
     lint-indent
     lint-package
 }
@@ -582,6 +604,20 @@ function lint-compile {
         && success "Linting compilation finished without errors." \
             || error "Linting compilation failed."
     unset compile_error_on_warn
+}
+
+function lint-declare {
+    verbose 1 "Linting declarations..."
+
+    local check_declare_file="$(elisp-check-declare-file)"
+    paths_temp+=("$check_declare_file")
+
+    run_emacs \
+        --load "$check_declare_file" \
+        -f makem-check-declare-files-and-exit \
+        "${files_project_source[@]}" \
+        && success "Linting declarations finished without errors." \
+            || error "Linting declarations failed."
 }
 
 function lint-indent {
