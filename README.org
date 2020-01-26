@@ -93,9 +93,10 @@ The script may be called directly to specify additional options.
     lint-package   Run package-lint.
     lint-regexps   Run relint.
 
-    test, tests     Run all tests, ignoring missing test types.
-    test-buttercup  Run Buttercup tests.
-    test-ert        Run ERT tests.
+    test, tests           Run all tests, ignoring missing test types.
+    test-buttercup        Run Buttercup tests.
+    test-ert              Run ERT tests.
+    test-ert-interactive  Run ERT tests interactively.
 
     batch        Run Emacs in batch mode, loading project source and test files
                  automatically, with remaining args (after "--") passed to Emacs.

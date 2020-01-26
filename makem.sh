@@ -64,9 +64,10 @@ Rules:
   lint-package   Run package-lint.
   lint-regexps   Run relint.
 
-  test, tests     Run all tests, ignoring missing test types.
-  test-buttercup  Run Buttercup tests.
-  test-ert        Run ERT tests.
+  test, tests           Run all tests, ignoring missing test types.
+  test-buttercup        Run Buttercup tests.
+  test-ert              Run ERT tests.
+  test-ert-interactive  Run ERT tests interactively.
 
   batch        Run Emacs in batch mode, loading project source and test files
                automatically, with remaining args (after "--") passed to Emacs.
@@ -709,6 +710,16 @@ function tests {
 
     test-ert
     test-buttercup
+}
+
+function test-ert-interactive {
+    verbose 1 "Running ERT tests interactively..."
+
+    unset arg_batch
+    run_emacs \
+        $(args-load-files "${files_project_test[@]}") \
+        --eval "(ert-run-tests-interactively t)"
+    arg_batch="--batch"
 }
 
 function test-buttercup {
