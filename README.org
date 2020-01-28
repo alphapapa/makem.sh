@@ -101,7 +101,7 @@ The script may be called directly to specify additional options.
     batch        Run Emacs in batch mode, loading project source and test files
                  automatically, with remaining args (after "--") passed to Emacs.
     interactive  Run Emacs interactively, loading project source and test files
-                 automatically.
+                 automatically, with remaining args (after "--") passed to Emacs.
 
   Options:
     -d, --debug    Print debug info.

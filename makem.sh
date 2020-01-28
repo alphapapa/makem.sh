@@ -72,7 +72,7 @@ Rules:
   batch        Run Emacs in batch mode, loading project source and test files
                automatically, with remaining args (after "--") passed to Emacs.
   interactive  Run Emacs interactively, loading project source and test files
-               automatically.
+               automatically, with remaining args (after "--") passed to Emacs.
 
 Options:
   -d, --debug    Print debug info.
@@ -602,14 +602,15 @@ function batch {
 
     run_emacs \
         $(args-load-files "${files_project_feature[@]}" "${files_project_test[@]}") \
-        "${args_batch[@]}"
+        "${args_batch_interactive[@]}"
 }
 
 function interactive {
     # Run Emacs interactively.  Most useful with --sandbox and --install-deps.
     unset arg_batch
     run_emacs \
-        $(args-load-files "${files_project_feature[@]}" "${files_project_test[@]}")
+        $(args-load-files "${files_project_feature[@]}" "${files_project_test[@]}") \
+        "${args_batch_interactive[@]}"
     arg_batch="--batch"
 }
 
@@ -934,15 +935,20 @@ debug "LOAD PATH ARGS: ${args_load_paths[@]}"
 # Run rules.
 for rule in "${rest[@]}"
 do
-    if [[ $batch ]]
+    if [[ $batch || $interactive ]]
     then
-        debug "Adding batch argument: $rule"
-        args_batch+=("$rule")
+        debug "Adding batch/interactive argument: $rule"
+        args_batch_interactive+=("$rule")
 
     elif [[ $rule = batch ]]
     then
         # Remaining arguments are passed to Emacs.
         batch=true
+    elif [[ $rule = interactive ]]
+    then
+        # Remaining arguments are passed to Emacs.
+        interactive=true
+
     elif type -t "$rule" 2>/dev/null | grep function &>/dev/null
     then
         # Pass called-directly as $1 to indicate that the rule is
@@ -958,8 +964,9 @@ do
     fi
 done
 
-# The batch rule.
+# Batch/interactive rules.
 [[ $batch ]] && batch
+[[ $interactive ]] && interactive
 
 if [[ $errors -gt 0 ]]
 then
