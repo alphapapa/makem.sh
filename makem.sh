@@ -60,7 +60,7 @@ Rules:
   lint-checkdoc  Run checkdoc.
   lint-compile   Byte-compile source files with warnings as errors.
   lint-declare   Run check-declare.
-  lint-indent    Run indent-lint.
+  lint-indent    Lint indentation.
   lint-package   Run package-lint.
   lint-regexps   Run relint.
 
@@ -173,6 +173,43 @@ function elisp-check-declare-file {
       (kill-emacs 1))))
 EOF
     echo $file
+}
+
+function elisp-lint-indent-file {
+    # This function prints warnings for indentation errors and exits
+    # non-zero when errors are found.
+    local file=$(mktemp)
+
+    cat >"$file" <<EOF
+(require 'cl-lib)
+
+(defun makem-lint-indent-batch-and-exit ()
+  "Print warnings for files which are not indented properly, then exit.
+Exits non-zero if mis-indented lines are found.  Checks files in
+'command-line-args-left'."
+  (let ((errors-p))
+    (cl-labels ((lint-file (file)
+                           (find-file file)
+                           (let ((tick (buffer-modified-tick)))
+                             (let ((inhibit-message t))
+                               (indent-region (point-min) (point-max)))
+                             (when (/= tick (buffer-modified-tick))
+                               ;; Indentation changed: warn for each line.
+                               (dolist (line (undo-lines buffer-undo-list))
+                                 (message "%s:%s: Indentation mismatch" (buffer-name) line))
+                               (setf errors-p t))))
+                (undo-lines (undo-list)
+                            ;; Return list of lines changed in UNDO-LIST.
+                            (nreverse (cl-loop for elt in undo-list
+                                               when (and (consp elt)
+                                                         (numberp (car elt)))
+                                               collect (line-number-at-pos (car elt))))))
+      (mapc #'lint-file (mapcar #'expand-file-name command-line-args-left))
+      (when errors-p
+        (kill-emacs 1)))))
+EOF
+
+    echo "$file"
 }
 
 function elisp-package-initialize-file {
@@ -663,8 +700,6 @@ function lint-declare {
 }
 
 function lint-indent {
-    ensure-package-available indent-lint $1 || return $(echo-unset-p $1)
-
     verbose 1 "Linting indentation..."
 
     # We load project source files as well, because they may contain
@@ -672,9 +707,9 @@ function lint-indent {
     # indentation.
 
     run_emacs \
-        --load indent-lint \
+        --load "$(elisp-lint-indent-file)" \
         $(args-load-files "${files_project_feature[@]}" "${files_project_test[@]}") \
-        --funcall indent-lint-batch \
+        --funcall makem-lint-indent-batch-and-exit \
         "${files_project_feature[@]}" "${files_project_test[@]}" \
         && success "Linting indentation finished without errors." \
             || error "Linting indentation failed."
@@ -834,8 +869,7 @@ do
             install_deps=true
             ;;
         --install-linters)
-            args_sandbox_package_install+=(--eval "(package-install 'indent-lint)"
-                                           --eval "(package-install 'package-lint)"
+            args_sandbox_package_install+=(--eval "(package-install 'package-lint)"
                                            --eval "(package-install 'relint)")
             ;;
         -d|--debug)

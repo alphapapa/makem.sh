@@ -89,7 +89,7 @@ The script may be called directly to specify additional options.
     lint-checkdoc  Run checkdoc.
     lint-compile   Byte-compile source files with warnings as errors.
     lint-declare   Run check-declare.
-    lint-indent    Run indent-lint.
+    lint-indent    Lint indentation.
     lint-package   Run package-lint.
     lint-regexps   Run relint.
 
