@@ -235,6 +235,7 @@ function run_emacs {
     local emacs_command=(
         "${emacs_command[@]}"
         -Q
+        "${args_debug[@]}"
         "${args_sandbox[@]}"
         -l $package_initialize_file
         $arg_batch
@@ -874,6 +875,8 @@ do
         -d|--debug)
             debug=true
             verbose=2
+            args_debug=(--eval "(setq init-file-debug t)"
+                        --eval "(setq debug-on-error t)")
             ;;
         --debug-load-path)
             debug_load_path=true
