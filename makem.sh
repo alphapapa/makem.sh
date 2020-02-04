@@ -826,15 +826,15 @@ color=true
 
 # ** Colors
 
-COLOR_off='\e[0m'
-COLOR_black='\e[0;30m'
-COLOR_red='\e[0;31m'
-COLOR_green='\e[0;32m'
-COLOR_yellow='\e[0;33m'
-COLOR_blue='\e[0;34m'
-COLOR_purple='\e[0;35m'
-COLOR_cyan='\e[0;36m'
-COLOR_white='\e[0;37m'
+COLOR_off='\033[0m'
+COLOR_black='\033[0;30m'
+COLOR_red='\033[0;31m'
+COLOR_green='\033[0;32m'
+COLOR_yellow='\033[0;33m'
+COLOR_blue='\033[0;34m'
+COLOR_purple='\033[0;35m'
+COLOR_cyan='\033[0;36m'
+COLOR_white='\033[0;37m'
 
 # ** Package system args
 
