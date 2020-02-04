@@ -768,9 +768,8 @@ function test-buttercup {
     paths_temp+=("$buttercup_file")
 
     run_emacs \
-        --load buttercup \
-        --load "$buttercup_file" \
-        -f buttercup-run-discover \
+        $(args-load-files "${files_project_test[@]}") \
+        -f buttercup-run \
         && success "Buttercup tests finished without errors." \
             || error "Buttercup tests failed."
 }
