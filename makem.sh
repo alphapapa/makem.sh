@@ -101,7 +101,8 @@ Sandbox options:
 
 Source files are automatically discovered from git, or may be
 specified with options.  Package dependencies are discovered from
-"Package-Requires" headers in source files and from a Cask file.
+"Package-Requires" headers in source files, from -pkg.el files, and
+from a Cask file.
 EOF
 }
 
@@ -405,6 +406,12 @@ function dependencies {
     then
         egrep '\(depends-on "[^"]+"' Cask \
             | sed -r -e 's/\(depends-on "([^"]+)".*/\1/g'
+    fi
+
+    # Search -pkg.el file.
+    if [[ $(git ls-files ./*-pkg.el 2>/dev/null) ]]
+    then
+        sed -nr 's/.*\(([-[:alnum:]]+)[[:blank:]]+"[.[:digit:]]+"\).*/\1/p' $(git ls-files ./*-pkg.el 2>/dev/null)
     fi
 }
 
