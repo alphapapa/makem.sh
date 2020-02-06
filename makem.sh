@@ -92,9 +92,10 @@ Options:
 Sandbox options:
   -s, --sandbox          Run Emacs with an empty config in a temporary
                          sandbox directory (removing directory on exit).
-  -S, --sandbox-dir DIR  Run Emacs with DIR as persistent sandbox directory.
-                         Makes an Emacs version-specific subdirectory, which
-                         facilitates testing under multiple Emacs versions.
+  -S, --sandbox-dir DIR  Run Emacs with DIR as persistent sandbox directory,
+                         making DIR if it doesn't exist.  Makes an Emacs
+                         version-specific subdirectory, which facilitates
+                         testing under multiple Emacs versions.
   --install-deps         Automatically install package dependencies.
   --install-linters      Automatically install linters.
   -i, --install PACKAGE  Install PACKAGE before running rules.
@@ -426,7 +427,11 @@ function sandbox {
     if [[ $sandbox_dir ]]
     then
         # Directory given as argument: ensure it exists.
-        [[ -d $sandbox_dir ]] || die "Directory doesn't exist: $sandbox_dir"
+        if ! [[ -d $sandbox_dir ]]
+        then
+            debug "Making sandbox directory: $sandbox_dir"
+            mkdir -p "$sandbox_dir" || die "Unable to make sandbox dir."
+        fi
 
         # Add Emacs version-specific subdirectory, creating if necessary.
         sandbox_dir="$sandbox_dir/$(emacs-version)"

@@ -121,9 +121,10 @@ The script may be called directly to specify additional options.
   Sandbox options:
     -s, --sandbox          Run Emacs with an empty config in a temporary
                            sandbox directory (removing directory on exit).
-    -S, --sandbox-dir DIR  Run Emacs with DIR as persistent sandbox directory.
-                           Makes an Emacs version-specific subdirectory, which
-                           facilitates testing under multiple Emacs versions.
+    -S, --sandbox-dir DIR  Run Emacs with DIR as persistent sandbox directory, 
+                           making DIR if it doesn't exist.  Makes an Emacs
+                           version-specific subdirectory, which facilitates
+                           testing under multiple Emacs versions.
     --install-deps         Automatically install package dependencies.
     --install-linters      Automatically install linters.
     -i, --install PACKAGE  Install PACKAGE before running rules.
