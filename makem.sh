@@ -617,7 +617,10 @@ function ts {
 
 function emacs-version {
     # Echo Emacs version number.
-    run_emacs --eval "(princ emacs-version)" || die "Unable to get Emacs version."
+
+    # Don't use run_emacs function, which does more than we need.
+    "${emacs_command[@]}" -Q --batch --eval "(princ emacs-version)" \
+        || die "Unable to get Emacs version."
 }
 
 # * Rules
