@@ -90,15 +90,19 @@ Options:
   -C, --no-compile  Don't compile files automatically.
 
 Sandbox options:
-  -s, --sandbox [DIR]    Run Emacs with an empty config in a sandbox DIR.  If
-                         DIR does not exist, it is created.  Makes an Emacs
-                         version-specific subdirectory, which facilitates
-                         testing under multiple Emacs versions.  If DIR is not
-                         specified, a temporary directory is used and is
-                         deleted afterward, and imply --install-deps.
+  -s, --sandbox [DIR]    Run Emacs with an empty config in a sandbox DIR.
+                         If DIR does not exist, make it.  If DIR is not
+                         specified, use a temporary sandbox directory and
+                         delete it afterward, implying --install-deps and
+                         --install-linters.
   --install-deps         Automatically install package dependencies.
   --install-linters      Automatically install linters.
   -i, --install PACKAGE  Install PACKAGE before running rules.
+
+  An Emacs version-specific subdirectory is automatically made inside
+  the sandbox, allowing testing with multiple Emacs versions.  When
+  specifying a sandbox directory, use options --install-deps and
+  --install-linters on first-run and omit them afterward to save time.
 
 Source files are automatically discovered from git, or may be
 specified with options.  Package dependencies are discovered from
@@ -469,6 +473,15 @@ function sandbox {
         done
     fi
 
+    # Add package-install arguments for linters.
+    if [[ $install_linters ]]
+    then
+        debug "Installing linters: package-lint relint"
+
+        args_sandbox_package_install+=(--eval "(package-install 'package-lint)"
+                                       --eval "(package-install 'relint)")
+    fi
+
     # *** Install packages into sandbox
 
     if [[ ${args_sandbox_package_install[@]} ]]
@@ -621,6 +634,13 @@ function emacs-version {
     # Don't use run_emacs function, which does more than we need.
     "${emacs_command[@]}" -Q --batch --eval "(princ emacs-version)" \
         || die "Unable to get Emacs version."
+}
+
+function rule-p {
+    # Return 0 if $1 is a rule.
+    [[ $1 =~ ^(lint-?|tests?)$ ]] \
+        || [[ $1 =~ ^(batch|interactive)$ ]] \
+        || [[ $(type -t "$2" 2>/dev/null) =~ function ]]
 }
 
 # * Rules
@@ -884,8 +904,7 @@ do
             install_deps=true
             ;;
         --install-linters)
-            args_sandbox_package_install+=(--eval "(package-install 'package-lint)"
-                                           --eval "(package-install 'relint)")
+            install_linters=true
             ;;
         -d|--debug)
             debug=true
@@ -912,20 +931,29 @@ do
             sandbox=true
             # Check whether next argument is an option, rule, or a sandbox directory.
             if [[ $2 ]] && ! [[ $2 =~ ^-- ]] \
-                   && ! [[ $(type -t "$2" 2>/dev/null) =~ function ]]
+                   && ! rule-p "$2"
             then
-                # Directory specified: use it.
+                debug "Sandbox dir: $1"
                 shift
                 sandbox_dir="$1"
             else
-                # Directory not specified: install deps automatically.
-                # NOTE: Linters are not installed automatically.
+                debug "No sandbox dir: installing dependencies."
                 install_deps=true
                 # HACK: Next argument is another option, so prepend blank arg to the
                 # argument list so it will be processed by next loop iteration.  getopts
                 # doesn't allow options to have optional arguments, so we do this manually.
-                shift
-                new_args=("" "$@")
+                if [[ $2 =~ ^- ]]
+                then
+                    # Next argument is an option: process it next.
+                    new_args=("" "$@")
+                else
+                    # Next argument is not an option: put it on the end.
+                    new_arg="$2"
+                    shift
+                    shift
+                    new_args=("" "$@" "$new_arg")
+                fi
+                debug "Setting new args: ${new_args[@]}"
                 set -- "${new_args[@]}"
             fi
             ;;
@@ -992,6 +1020,21 @@ fi
 # Set load path.
 args_load_paths=($(args-load-path))
 debug "LOAD PATH ARGS: ${args_load_paths[@]}"
+
+# If rules include linters and sandbox-dir is unspecified, install
+# linters automatically.
+if [[ $sandbox && ! $sandbox_dir ]] && [[ "${rest[@]}" =~ lint ]]
+then
+    for rule in "${rest[@]}"
+    do
+        if rule-p "$rule"
+        then
+            debug "Installing linters automatically."
+            install_linters=true
+            break
+        fi
+    done
+fi
 
 # Initialize sandbox.
 [[ $sandbox ]] && sandbox
