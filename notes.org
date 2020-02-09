@@ -1,0 +1,5 @@
+#+TITLE: makem.sh notes
+
+* Ideas
+
+** TODO Set Emacs frame title in interactive sandbox
