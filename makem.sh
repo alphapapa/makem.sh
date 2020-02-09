@@ -1026,15 +1026,8 @@ debug "LOAD PATH ARGS: ${args_load_paths[@]}"
 # linters automatically.
 if [[ $sandbox && ! $sandbox_dir ]] && [[ "${rest[@]}" =~ lint ]]
 then
-    for rule in "${rest[@]}"
-    do
-        if rule-p "$rule"
-        then
-            debug "Installing linters automatically."
-            install_linters=true
-            break
-        fi
-    done
+    debug "Installing linters automatically."
+    install_linters=true
 fi
 
 # Initialize sandbox.
