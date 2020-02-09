@@ -456,6 +456,7 @@ function sandbox {
 
     # Set sandbox args.  This is a global variable used by the run_emacs function.
     args_sandbox=(
+        --title "makem.sh: $(basename $(pwd)) (sandbox: $sandbox_dir)"
         --eval "(setq user-emacs-directory (file-truename \"$sandbox_dir\"))"
         --eval "(setq user-init-file (file-truename \"$init_file\"))"
         "${args_load_init_file[@]}"
