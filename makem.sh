@@ -90,12 +90,12 @@ Options:
   -C, --no-compile  Don't compile files automatically.
 
 Sandbox options:
-  -s, --sandbox          Run Emacs with an empty config in a temporary
-                         sandbox directory (removing directory on exit).
-  -S, --sandbox-dir DIR  Run Emacs with DIR as persistent sandbox directory,
-                         making DIR if it doesn't exist.  Makes an Emacs
+  -s, --sandbox [DIR]    Run Emacs with an empty config in a sandbox DIR.  If
+                         DIR does not exist, it is created.  Makes an Emacs
                          version-specific subdirectory, which facilitates
-                         testing under multiple Emacs versions.
+                         testing under multiple Emacs versions.  If DIR is not
+                         specified, a temporary directory is used and is
+                         deleted afterward, and imply --install-deps.
   --install-deps         Automatically install package dependencies.
   --install-linters      Automatically install linters.
   -i, --install PACKAGE  Install PACKAGE before running rules.
@@ -871,8 +871,8 @@ elisp_org_package_archive="(add-to-list 'package-archives '(\"org\" . \"https://
 # * Args
 
 args=$(getopt -n "$0" \
-              -o dhe:E:i:sS:vf:CO \
-              -l exclude:,emacs:,install-deps,install-linters,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-org-repo,sandbox,sandbox-dir: \
+              -o dhe:E:i:s:vf:CO \
+              -l exclude:,emacs:,install-deps,install-linters,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-org-repo,sandbox: \
               -- "$@") \
     || { usage; exit 1; }
 eval set -- "$args"
@@ -910,11 +910,24 @@ do
             ;;
         -s|--sandbox)
             sandbox=true
-            ;;
-        -S|--sandbox-dir)
-            shift
-            sandbox=true
-            sandbox_dir="$1"
+            # Check whether next argument is an option, rule, or a sandbox directory.
+            if [[ $2 ]] && ! [[ $2 =~ ^-- ]] \
+                   && ! [[ $(type -t "$2" 2>/dev/null) =~ function ]]
+            then
+                # Directory specified: use it.
+                shift
+                sandbox_dir="$1"
+            else
+                # Directory not specified: install deps automatically.
+                # NOTE: Linters are not installed automatically.
+                install_deps=true
+                # HACK: Next argument is another option, so prepend blank arg to the
+                # argument list so it will be processed by next loop iteration.  getopts
+                # doesn't allow options to have optional arguments, so we do this manually.
+                shift
+                new_args=("" "$@")
+                set -- "${new_args[@]}"
+            fi
             ;;
         -v|--verbose)
             ((verbose++))
