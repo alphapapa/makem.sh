@@ -943,6 +943,7 @@ do
                 # HACK: Next argument is another option, so prepend blank arg to the
                 # argument list so it will be processed by next loop iteration.  getopts
                 # doesn't allow options to have optional arguments, so we do this manually.
+                # TODO: Yes it does: use two colons.  Check its man page, silly.
                 if [[ $2 =~ ^- ]]
                 then
                     # Next argument is an option: process it next.
