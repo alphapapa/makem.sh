@@ -451,15 +451,12 @@ function sandbox {
 
     # Make argument to load init file if it exists.
     init_file="$sandbox_dir/init.el"
-    [[ -r $init_file ]] \
-        && local args_load_init_file=(--load "$init_file")
 
     # Set sandbox args.  This is a global variable used by the run_emacs function.
     args_sandbox=(
         --title "makem.sh: $(basename $(pwd)) (sandbox: $sandbox_dir)"
         --eval "(setq user-emacs-directory (file-truename \"$sandbox_dir\"))"
         --eval "(setq user-init-file (file-truename \"$init_file\"))"
-        "${args_load_init_file[@]}"
     )
 
     # Add package-install arguments for dependencies.
@@ -684,6 +681,7 @@ function interactive {
     unset arg_batch
     run_emacs \
         $(args-load-files "${files_project_feature[@]}" "${files_project_test[@]}") \
+        --eval "(load user-init-file)" \
         "${args_batch_interactive[@]}"
     arg_batch="--batch"
 }
