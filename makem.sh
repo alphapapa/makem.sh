@@ -945,6 +945,7 @@ do
                 if [[ $2 =~ ^- ]]
                 then
                     # Next argument is an option: process it next.
+                    shift
                     new_args=("" "$@")
                 else
                     # Next argument is not an option: put it on the end.
