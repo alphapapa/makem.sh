@@ -427,6 +427,8 @@ function sandbox {
 
     # *** Sandbox arguments
 
+    # MAYBE: Optionally use branch-specific sandbox?
+
     # Check or make user-emacs-directory.
     if [[ $sandbox_dir ]]
     then
