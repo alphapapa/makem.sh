@@ -119,14 +119,14 @@ The script may be called directly to specify additional options.
     -C, --no-compile  Don't compile files automatically.
 
   Sandbox options:
-    -s, --sandbox [DIR]    Run Emacs with an empty config in a sandbox DIR.
-                           If DIR does not exist, make it.  If DIR is not
-                           specified, use a temporary sandbox directory and
-                           delete it afterward, implying --install-deps and
-                           --install-linters.
-    --install-deps         Automatically install package dependencies.
-    --install-linters      Automatically install linters.
-    -i, --install PACKAGE  Install PACKAGE before running rules.
+    -s[DIR], --sandbox[=DIR]  Run Emacs with an empty config in a sandbox DIR.
+                              If DIR does not exist, make it.  If DIR is not
+                              specified, use a temporary sandbox directory and
+                              delete it afterward, implying --install-deps and
+                              --install-linters.
+    --install-deps            Automatically install package dependencies.
+    --install-linters         Automatically install linters.
+    -i, --install PACKAGE     Install PACKAGE before running rules.
 
     An Emacs version-specific subdirectory is automatically made inside
     the sandbox, allowing testing with multiple Emacs versions.  When
