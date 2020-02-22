@@ -16,20 +16,22 @@ The script can run Emacs with the developer's local Emacs configuration, or with
 
 * Contents                                                         :noexport:
 :PROPERTIES:
-:TOC:      this
+:TOC:      :include siblings :depth 0
 :END:
--  [[#installation][Installation]]
--  [[#usage][Usage]]
-  -  [[#script][Script]]
-  -  [[#makefile][Makefile]]
-  -  [[#github-action][GitHub Action]]
-  -  [[#git-pre-push-hook][git pre-push hook]]
--  [[#comparisons][Comparisons]]
--  [[#changelog][Changelog]]
+:CONTENTS:
+- [[#installation][Installation]]
+- [[#usage][Usage]]
+  - [[#makemsh-script][makem.sh script]]
+  - [[#makefile][Makefile]]
+  - [[#github-action][GitHub Action]]
+  - [[#github-linguist-statistics][GitHub Linguist statistics]]
+  - [[#git-pre-push-hook][git pre-push hook]]
+- [[#comparisons][Comparisons]]
+:END:
 
 * Screenshots
 :PROPERTIES:
-:TOC:      ignore
+:TOC:      :ignore (this)
 :END:
 
 Some example output.  The first shows running the =test= rule with verbosity level 1, which shows which tests are run but omits each test's output unless it fails:
@@ -65,12 +67,19 @@ Copy =makem.sh= into your package's root directory.  Optionally, also copy =Make
 
 * Usage
 :PROPERTIES:
-:TOC:      1
+:TOC:      :include descendants :depth 1
 :END:
-
 The =makem.sh= script can be called directly or through a =Makefile=.  Use =makem.sh --help= to list available rules.
 
-** Script
+:CONTENTS:
+- [[#makemsh-script][makem.sh script]]
+- [[#makefile][Makefile]]
+- [[#github-action][GitHub Action]]
+- [[#github-linguist-statistics][GitHub Linguist statistics]]
+- [[#git-pre-push-hook][git pre-push hook]]
+:END:
+
+** =makem.sh= script
 
 The script may be called directly to specify additional options.
 
@@ -177,6 +186,14 @@ Using Steve Purcell's [[https://github.com/purcell/setup-emacs][setup-emacs]] Ac
 1.  Put =makem.sh= in your package's repo and make it executable.
 2.  Add =test.yml= to your package's repo at =.github/workflows/test.yml=.  It should work without modification for most Emacs packages.
 
+** GitHub Linguist statistics
+
+Having =makem.sh= in your repository will affect GitHub's language stats provided by [[Https://github.com/github/linguist][Linguist]], which might cause it to be classified as a Shell project rather than an Emacs Lisp one.  The [[https://github.com/github/linguist#my-repository-is-detected-as-the-wrong-language][Linguist documentation]] explains how to avoid this.  Probably the most appropriate way is to use a =.gitattributes= file to classify =makem.sh= as vendored, like:
+
+#+BEGIN_EXAMPLE sh
+  makem.sh linguist-vendored
+#+END_EXAMPLE
+
 ** git pre-push hook
 
 It's often helpful to run tests automatically before pushing with git.  Here's an example of using =makem.sh= in a =pre-push= hook:
@@ -264,7 +281,7 @@ Of these alternatives, =makel= is most like =makem.sh=.  It's simple and require
 
 * Changelog
 :PROPERTIES:
-:TOC:      0
+:TOC:      :ignore this
 :END:
 
 ** 0.1-pre
@@ -273,21 +290,21 @@ Initial release.
 
 * Credits
 :PROPERTIES:
-:TOC:      ignore
+:TOC:      :ignore this
 :END:
 
 Inspired by Damien Cassou's excellent [[https://gitlab.petton.fr/DamienCassou/makel][makel]] project.
 
 * Development
 :PROPERTIES:
-:TOC:      ignore
+:TOC:      :ignore this
 :END:
 
 Bug reports, feature requests, suggestions — /oh my/!
 
 * License
 :PROPERTIES:
-:TOC:      ignore
+:TOC:      :ignore this
 :END:
 
 GPLv3
