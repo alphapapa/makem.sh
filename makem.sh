@@ -827,7 +827,7 @@ function test-ert {
 
 # * Defaults
 
-test_files_regexp='^((tests?|t)/)|-test.el$|^test-'
+test_files_regexp='^((tests?|t)/)|-tests?.el$|^test-'
 
 emacs_command=("emacs")
 errors=0
