@@ -184,7 +184,7 @@ A default =Makefile= is provided which calls the =makem.sh= script.  Call it wit
 Using Steve Purcell's [[https://github.com/purcell/setup-emacs][setup-emacs]] Action, it's easy to set up CI on GitHub for an Emacs package.
 
 1.  Put =makem.sh= in your package's repo and make it executable.
-2.  Add [[file:test.yml][test.yml]] to your package's repo at =.github/workflows/test.yml=.  It should work without modification for most Emacs packages.
+2.  Add [[file:test.yml][test.yml]] (from the =makem.sh= repo) to your package's repo at =.github/workflows/test.yml=.  It should work without modification for most Emacs packages.
 
 ** GitHub Linguist statistics
 
