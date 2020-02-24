@@ -400,7 +400,7 @@ function dependencies {
     # Echo list of package dependencies.
 
     # Search package headers.
-    egrep '^;; Package-Requires: ' $(files-project-feature) $(files-project-test) \
+    egrep -i '^;; Package-Requires: ' $(files-project-feature) $(files-project-test) \
         | egrep -o '\([^([:space:]][^)]*\)' \
         | egrep -o '^[^[:space:])]+' \
         | sed -r 's/\(//g' \
