@@ -423,7 +423,7 @@ function dependencies {
 # ** Sandbox
 
 function sandbox {
-    # Initialize sandbox.
+    verbose 2 "Initializing sandbox..."
 
     # *** Sandbox arguments
 
@@ -487,15 +487,16 @@ function sandbox {
     if [[ ${args_sandbox_package_install[@]} ]]
     then
         # Initialize the sandbox (installs packages once rather than for every rule).
-        debug "Initializing sandbox..."
+        verbose 1 "Installing packages into sandbox..."
 
         run_emacs \
             --eval "(package-refresh-contents)" \
             "${args_sandbox_package_install[@]}" \
-            || die "Unable to initialize sandbox."
+            && success "Packages installed." \
+                || die "Unable to initialize sandbox."
     fi
 
-    debug "Sandbox initialized."
+    verbose 2 "Sandbox initialized."
 }
 
 # ** Utility
