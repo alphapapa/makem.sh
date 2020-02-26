@@ -674,8 +674,9 @@ function compile {
 }
 
 function batch {
-    # Run Emacs with $args_batch and with project source and test files loaded.
-    verbose 1 "Executing Emacs with arguments: ${args_batch[@]}"
+    # Run Emacs in batch mode with ${args_batch_interactive[@]} and
+    # with project source and test files loaded.
+    verbose 1 "Executing Emacs with arguments: ${args_batch_interactive[@]}"
 
     run_emacs \
         $(args-load-files "${files_project_feature[@]}" "${files_project_test[@]}") \
