@@ -685,6 +685,9 @@ function batch {
 
 function interactive {
     # Run Emacs interactively.  Most useful with --sandbox and --install-deps.
+    verbose 1 "Running Emacs interactively..."
+    verbose 2 "Loading files:" "${files_project_feature[@]}" "${files_project_test[@]}"
+
     unset arg_batch
     run_emacs \
         $(args-load-files "${files_project_feature[@]}" "${files_project_test[@]}") \
