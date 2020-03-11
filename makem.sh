@@ -973,8 +973,7 @@ do
             ;;
         -f|--file)
             shift
-            project_source_files+=("$1")
-            project_byte_compile_files+=("$1")
+            args_files+=("$1")
             ;;
         -O|--no-org-repo)
             unset elisp_org_package_archive
@@ -1011,6 +1010,13 @@ trap cleanup EXIT INT TERM
 files_project_feature=($(files-project-feature))
 files_project_test=($(files-project-test))
 files_project_byte_compile=("${files_project_feature[@]}" "${files_project_test[@]}")
+
+if [[ ${args_files[@]} ]]
+then
+    # Add specified files.
+    files_project_feature+=("${args_files[@]}")
+    files_project_byte_compile+=("${args_files[@]}")
+fi
 
 debug "EXCLUDING FILES: ${files_exclude[@]}"
 debug "FEATURE FILES: ${files_project_feature[@]}"
