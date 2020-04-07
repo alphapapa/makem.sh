@@ -1,5 +1,15 @@
 #+TITLE: makem.sh notes
 
+* Tasks
+
+** TODO Fix/explain issues regarding byte-compilation order
+
+Because the order in which files are byte-compiled is not guaranteed, and because the =lint-compile= rule compiles all files in a single Emacs session, it can obscure compilation errors which would occur if each file were compiled in a separate session.  It seems that =package.el= can behave similarly, because it may compile a package's files without errors even though errors could occur if each file in the package were compiled in a separate session.
+
+*** TODO Add option to byte-compile files individually
+
+*** TODO Document this issue
+
 * Ideas
 
 ** TODO Set Emacs frame title in interactive sandbox
