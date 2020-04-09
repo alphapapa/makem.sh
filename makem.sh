@@ -414,7 +414,7 @@ function package-main-file {
         done \
             | sort -h \
             | head -n1 \
-            | sed 's/^[[:digit:]] //'
+            | sed -r 's/^[[:digit:]]+ //'
     fi
 }
 
