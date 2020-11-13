@@ -2,6 +2,16 @@
 
 * Checklists
 
+** Release 0.1.1
+
++  [X] Update version numbers
+     -  [X] =makem.sh=
+     -  [X] =Makefile=
+     -  [X] =test.yml=
+     -  [X] =README.org=
++  [ ] Tag and sign release
++  [ ] Push
+
 ** Release: 0.1
 
 +  [X] Update version numbers

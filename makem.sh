@@ -3,7 +3,7 @@
 # * makem.sh --- Script to aid building and testing Emacs Lisp packages
 
 # URL: https://github.com/alphapapa/makem.sh
-# Version: 0.1
+# Version: 0.1.1
 
 # * Commentary:
 
