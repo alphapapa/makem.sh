@@ -50,6 +50,7 @@ jobs:
     - name: Initialize sandbox
       run: |
         SANDBOX_DIR=$(mktemp -d) || exit 1
+        # FIXME: Update to new syntax.  See <https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable>
         echo ::set-env name=SANDBOX_DIR::$SANDBOX_DIR
         ./makem.sh -vv --sandbox=$SANDBOX_DIR --install-deps --install-linters
 
