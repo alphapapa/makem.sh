@@ -1,0 +1,62 @@
+#+TITLE: makem.sh notes
+
+* Checklists
+
+** DONE Release 0.1.1
+CLOSED: [2020-11-13 Fri 21:42]
+:LOGBOOK:
+-  State "DONE"       from              [2020-11-13 Fri 21:42]
+:END:
+
++  [X] Update version numbers
+     -  [X] =makem.sh=
+     -  [X] =Makefile=
+     -  [X] =test.yml=
+     -  [X] =README.org=
++  [X] Tag and sign release
++  [X] Push
+
+** DONE Release: 0.1
+CLOSED: [2020-11-13 Fri 21:42]
+:LOGBOOK:
+-  State "DONE"       from              [2020-11-13 Fri 21:42]
+:END:
+
++  [X] Update version numbers
+     -  [X] =makem.sh=
+     -  [X] =Makefile=
+     -  [X] =test.yml=
+     -  [X] =README.org=
++  [X] Tag and sign release
++  [X] Push
+
+** Release template
+
++  [ ] Update version numbers
+     -  [ ] =makem.sh=
+     -  [ ] =Makefile=
+     -  [ ] =test.yml=
+     -  [ ] =README.org=
++  [ ] Tag and sign release
++  [ ] Push
+
+* Tasks
+
+** TODO Fix/explain issues regarding byte-compilation order
+
+Because the order in which files are byte-compiled is not guaranteed, and because the =lint-compile= rule compiles all files in a single Emacs session, it can obscure compilation errors which would occur if each file were compiled in a separate session.  It seems that =package.el= can behave similarly, because it may compile a package's files without errors even though errors could occur if each file in the package were compiled in a separate session.
+
+*** TODO Add option to byte-compile files individually
+
+*** TODO Document this issue
+
+** MAYBE Use =package-install-file= to install dependencies in sandbox
+:LOGBOOK:
+-  State "MAYBE"      from              [2020-11-13 Fri 20:47]
+:END:
+
+Rather than parsing them manually.  Might solve problems (like needing a newer version of =map= than is built-in) and allow some code to be deleted.
+
+* Ideas
+
+** TODO Set Emacs frame title in interactive sandbox
