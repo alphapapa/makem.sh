@@ -10,6 +10,13 @@ Because the order in which files are byte-compiled is not guaranteed, and becaus
 
 *** TODO Document this issue
 
+** MAYBE Use =package-install-file= to install dependencies in sandbox
+:LOGBOOK:
+-  State "MAYBE"      from              [2020-11-13 Fri 20:47]
+:END:
+
+Rather than parsing them manually.  Might solve problems (like needing a newer version of =map= than is built-in) and allow some code to be deleted.
+
 * Ideas
 
 ** TODO Set Emacs frame title in interactive sandbox
