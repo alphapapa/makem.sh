@@ -1,6 +1,9 @@
 # * test.yml --- Test Emacs packages using makem.sh on GitHub Actions
 
-# https://github.com/alphapapa/makem.sh
+# URL: https://github.com/alphapapa/makem.sh
+# Version: 0.1
+
+# * Commentary:
 
 # Based on Steve Purcell's examples at
 # <https://github.com/purcell/setup-emacs/blob/master/.github/workflows/test.yml>,
