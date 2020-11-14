@@ -9,8 +9,8 @@
      -  [X] =Makefile=
      -  [X] =test.yml=
      -  [X] =README.org=
-+  [ ] Tag and sign release
-+  [ ] Push
++  [X] Tag and sign release
++  [X] Push
 
 ** Release: 0.1
 
