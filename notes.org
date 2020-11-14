@@ -2,7 +2,11 @@
 
 * Checklists
 
-** Release 0.1.1
+** DONE Release 0.1.1
+CLOSED: [2020-11-13 Fri 21:42]
+:LOGBOOK:
+-  State "DONE"       from              [2020-11-13 Fri 21:42]
+:END:
 
 +  [X] Update version numbers
      -  [X] =makem.sh=
@@ -12,7 +16,11 @@
 +  [X] Tag and sign release
 +  [X] Push
 
-** Release: 0.1
+** DONE Release: 0.1
+CLOSED: [2020-11-13 Fri 21:42]
+:LOGBOOK:
+-  State "DONE"       from              [2020-11-13 Fri 21:42]
+:END:
 
 +  [X] Update version numbers
      -  [X] =makem.sh=
