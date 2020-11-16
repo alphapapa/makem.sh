@@ -285,6 +285,11 @@ Of these alternatives, =makel= is most like =makem.sh=.  It's simple and require
 :TOC:      :ignore this
 :END:
 
+** 0.2
+
+*Added*
++  Emacs 27.1 to =test.yml=.
+
 ** 0.1.1
 
 *Updated*

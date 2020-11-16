@@ -1,7 +1,7 @@
 # * test.yml --- Test Emacs packages using makem.sh on GitHub Actions
 
 # URL: https://github.com/alphapapa/makem.sh
-# Version: 0.1.1
+# Version: 0.2
 
 # * Commentary:
 
@@ -42,6 +42,7 @@ jobs:
       matrix:
         emacs_version:
           - 26.3
+          - 27.1
           - snapshot
     steps:
     - uses: purcell/setup-emacs@master
