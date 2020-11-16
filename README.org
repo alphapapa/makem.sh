@@ -26,6 +26,7 @@ The script can run Emacs with the developer's local Emacs configuration, or with
   - [[#github-action][GitHub Action]]
   - [[#github-linguist-statistics][GitHub Linguist statistics]]
   - [[#git-pre-push-hook][git pre-push hook]]
+- [[#changelog][Changelog]]
 - [[#comparisons][Comparisons]]
 :END:
 
@@ -224,6 +225,25 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
   make test
 #+END_SRC
 
+* Changelog
+:PROPERTIES:
+:TOC:      :ignore children
+:END:
+
+** 0.2
+
+*Added*
++  Emacs 27.1 to =test.yml=.
+
+** 0.1.1
+
+*Updated*
++  =test.yml=: Use new GitHub environment variable syntax.  (See [[https://github.blog/changelog/2020-10-01-github-actions-deprecating-set-env-and-add-path-commands/][notice]], [[https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#environment-files][documentation]].)
+
+** 0.1
+
+First tagged release.
+
 * Comparisons
 :PROPERTIES:
 :TOC:      ignore-children
@@ -279,25 +299,6 @@ Of these alternatives, =makel= is most like =makem.sh=.  It's simple and require
 +  =makel= is intended to be used by copying two Make files into the project repo directory.  It recommends allowing one of them to download the other automatically from the Internet when not present.  =makem.sh= is intended to be copied into place by the package developer.  No remote code is downloaded, other than installing Emacs package dependencies when requested.
 +  =makel= provides no built-in documentation, but it is very simple to use.  =makem.sh= can be used by reading a standard =--help= usage guide.
 +  =makel= is about 150 lines of Make code in one file.  =makem.sh= is about 600 lines of Bash code in one file.
-
-* Changelog
-:PROPERTIES:
-:TOC:      :ignore this
-:END:
-
-** 0.2
-
-*Added*
-+  Emacs 27.1 to =test.yml=.
-
-** 0.1.1
-
-*Updated*
-+  =test.yml=: Use new GitHub environment variable syntax.  (See [[https://github.blog/changelog/2020-10-01-github-actions-deprecating-set-env-and-add-path-commands/][notice]], [[https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#environment-files][documentation]].)
-
-** 0.1
-
-First tagged release.
 
 * Credits
 :PROPERTIES:
