@@ -230,6 +230,11 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 :TOC:      :ignore children
 :END:
 
+** 0.2.1
+
+*Fixed*
++  Use =-a= argument to =grep= in case an Elisp file contains control characters (rare, but sometimes necessary).
+
 ** 0.2
 
 *Added*
