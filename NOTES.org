@@ -2,6 +2,20 @@
 
 * Checklists
 
+** DONE Release: 0.2.1
+CLOSED: [2020-11-22 Sun 15:00]
+:LOGBOOK:
+-  State "DONE"       from              [2020-11-22 Sun 15:00]
+:END:
+
++  [X] Update version numbers
+     -  [X] =makem.sh=
+     -  [X] =Makefile=
+     -  [X] =test.yml=
+     -  [X] =README.org=
++  [X] Tag and sign release
++  [X] Push
+
 ** DONE Release 0.2
 CLOSED: [2020-11-16 Mon 06:00]
 :LOGBOOK:
