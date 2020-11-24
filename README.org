@@ -118,6 +118,7 @@ The script may be called directly to specify additional options.
     -d, --debug    Print debug info.
     -h, --help     I need somebody!
     -v, --verbose  Increase verbosity, up to -vv.
+    --no-color     Disable color output.
 
     --debug-load-path  Print load-path from inside Emacs.
 
@@ -126,8 +127,9 @@ The script may be called directly to specify additional options.
     -e, --exclude FILE  Exclude FILE from linting and testing.
     -f, --file FILE     Check FILE in addition to discovered files.
 
-    --no-color        Disable color output.
-    -C, --no-compile  Don't compile files automatically.
+    -c, --compile-batch  Batch-compile files (instead of separately; quicker, but
+                                              may hide problems).
+    -C, --no-compile     Don't compile files automatically.
 
   Sandbox options:
     -s[DIR], --sandbox[=DIR]  Run Emacs with an empty config in a sandbox DIR.
@@ -229,6 +231,14 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 :PROPERTIES:
 :TOC:      :ignore children
 :END:
+
+** 0.3
+
+*Added*
++  Option ~-c~ / ~--compile-batch~ compiles files as a batch, in a single Emacs process (faster, but may hide problems).
+
+*Changed*
++  Compile files separately rather than as a batch.  (Slower, but doesn't hide problems due to compilation order.)
 
 ** 0.2.1
 
