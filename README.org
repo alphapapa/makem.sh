@@ -117,7 +117,7 @@ The script may be called directly to specify additional options.
   Options:
     -d, --debug    Print debug info.
     -h, --help     I need somebody!
-    -v, --verbose  Increase verbosity, up to -vv.
+    -v, --verbose  Increase verbosity, up to -vvv.
     --no-color     Disable color output.
 
     --debug-load-path  Print load-path from inside Emacs.
@@ -231,6 +231,14 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 :PROPERTIES:
 :TOC:      :ignore children
 :END:
+
+** 0.4
+
+*Added*
++  Verbosity level 3 (i.e. ~-vvv~), currently only used in per-file byte-compilation output.
+
+*Fixed*
++  Redundant byte-compilation error message.
 
 ** 0.3
 

@@ -3,7 +3,7 @@
 # * makem.sh --- Script to aid building and testing Emacs Lisp packages
 
 # URL: https://github.com/alphapapa/makem.sh
-# Version: 0.3
+# Version: 0.4
 
 # * Commentary:
 
@@ -79,7 +79,7 @@ Rules:
 Options:
   -d, --debug    Print debug info.
   -h, --help     I need somebody!
-  -v, --verbose  Increase verbosity, up to -vv.
+  -v, --verbose  Increase verbosity, up to -vvv.
   --no-color     Disable color output.
 
   --debug-load-path  Print load-path from inside Emacs.
@@ -297,10 +297,12 @@ function byte-compile-file {
 
     [[ $compile_error_on_warn ]] && local error_on_warn=(--eval "(setq byte-compile-error-on-warn t)")
 
+    # FIXME: Why is the line starting with "&& verbose 3" not indented properly?  Emacs insists on indenting it back a level.
     run_emacs \
         "${error_on_warn[@]}" \
-        --eval "(byte-compile-file \"$file\")" \
-        || error "Compiling file failed: $file"
+        --eval "(unless (byte-compile-file \"$file\") (kill-emacs 1))" \
+        && verbose 3 "Compiling $file finished without errors." \
+            || { verbose 3 "Compiling file failed: $file"; return 1; }
 }
 
 # ** Files
@@ -659,6 +661,7 @@ function verbose {
     then
         [[ $1 -eq 1 ]] && local color_name=blue
         [[ $1 -ge 2 ]] && local color_name=cyan
+        [[ $1 -ge 3 ]] && local color_name=white
 
         shift
         log_color $color_name "$@" >&2
@@ -726,9 +729,7 @@ function compile-each {
             || compile_errors=t
     done
 
-    ! [[ $compile_errors ]] \
-        && success "Compiling finished without errors." \
-            || error "Compilation failed."
+    [[ ! $compile_errors ]]
 }
 
 function compile {
@@ -737,6 +738,18 @@ function compile {
         compile-batch "$@"
     else
         compile-each "$@"
+    fi
+    local status=$?
+
+    if [[ $compile_error_on_warn ]]
+    then
+        # Linting: just return status code, because lint rule will print messages.
+        [[ $status = 0 ]]
+    else
+        # Not linting: print messages here.
+        [[ $status = 0 ]] \
+            && success "Compiling finished without errors." \
+                || error "Compiling failed."
     fi
 }
 
