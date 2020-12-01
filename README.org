@@ -232,6 +232,11 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 :TOC:      :ignore children
 :END:
 
+** 0.4.1
+
+*Fixed*
++  Show all ~checkdoc~ warnings, not just the first one.
+
 ** 0.4
 
 *Added*
