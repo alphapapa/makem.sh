@@ -232,6 +232,12 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 :TOC:      :ignore children
 :END:
 
+** 0.4.2
+
+*Fixed*
++  Always set ~load-prefer-newer~ to ~t~ (rather than only when initializing packages).
++  When running ~interactive~, automatically byte-compile source files unless ~--no-compile~ is used, and load filenames sans extension so Emacs will prefer to load byte-compiled files.
+
 ** 0.4.1
 
 *Fixed*
