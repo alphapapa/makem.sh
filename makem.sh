@@ -233,7 +233,6 @@ function elisp-package-initialize-file {
                              (cons "melpa-stable" "https://stable.melpa.org/packages/")))
 $elisp_org_package_archive
 (package-initialize)
-(setq load-prefer-newer t)
 EOF
     echo $file
 }
@@ -246,6 +245,7 @@ function run_emacs {
     local emacs_command=(
         "${emacs_command[@]}"
         -Q
+        --eval "(setq load-prefer-newer t)"
         "${args_debug[@]}"
         "${args_sandbox[@]}"
         -l $package_initialize_file
