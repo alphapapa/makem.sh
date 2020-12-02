@@ -379,7 +379,8 @@ function args-load-files {
     # For file in $@, echo "--load $file".
     for file in "$@"
     do
-        printf -- '--load %q ' "$file"
+        sans_extension=${file%%.el}
+        printf -- '--load %q ' "$sans_extension"
     done
 }
 
@@ -766,12 +767,15 @@ function batch {
 
 function interactive {
     # Run Emacs interactively.  Most useful with --sandbox and --install-deps.
+    local load_file_args=$(args-load-files "${files_project_feature[@]}" "${files_project_test[@]}")
     verbose 1 "Running Emacs interactively..."
-    verbose 2 "Loading files:" "${files_project_feature[@]}" "${files_project_test[@]}"
+    verbose 2 "Loading files: ${load_file_args//--load /}"
+
+    [[ $compile ]] && compile
 
     unset arg_batch
     run_emacs \
-        $(args-load-files "${files_project_feature[@]}" "${files_project_test[@]}") \
+        $load_file_args \
         --eval "(load user-init-file)" \
         "${args_batch_interactive[@]}"
     arg_batch="--batch"
