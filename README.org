@@ -234,7 +234,8 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 
 ** 0.5-pre
 
-Nothing new yet.
+*Changed*
++  Display all byte-compile warnings when linting, not just the first.
 
 ** 0.4.2
 
