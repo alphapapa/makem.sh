@@ -232,7 +232,7 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 :TOC:      :ignore children
 :END:
 
-** 0.5-pre
+** 0.5
 
 *Changed*
 +  Display all byte-compile warnings when linting, not just the first.
