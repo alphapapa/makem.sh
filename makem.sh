@@ -697,7 +697,7 @@ function verbose {
     if [[ $verbose -ge $1 ]]
     then
         [[ $1 -eq 1 ]] && local color_name=blue
-        [[ $1 -ge 2 ]] && local color_name=cyan
+        [[ $1 -eq 2 ]] && local color_name=cyan
         [[ $1 -ge 3 ]] && local color_name=white
 
         shift
