@@ -234,7 +234,8 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 
 ** 0.6-pre
 
-Nothing new yet.
+*Added*
++  ~lint-elint~ rule (not enabled by default in ~lint~ rule due to Elint's output not seeming very useful).
 
 ** 0.5
 
