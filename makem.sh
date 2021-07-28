@@ -473,8 +473,7 @@ function ert-tests-p {
 }
 
 function package-main-file {
-    # Echo the package's main file.  Helpful for setting package-lint-main-file.
-
+    # Echo the package's main file.
     file_pkg=$(git ls-files ./*-pkg.el 2>/dev/null)
 
     if [[ $file_pkg ]]
