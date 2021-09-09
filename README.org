@@ -4,7 +4,7 @@
 
 # Note: This readme works with the org-make-toc <https://github.com/alphapapa/org-make-toc> package, which automatically updates the table of contents.
 
-=makem=.sh is a script helps to build, lint, and test Emacs Lisp packages.  It aims to make linting and testing as simple as possible without requiring per-package configuration.
+=makem=.sh is a script that helps to build, lint, and test Emacs Lisp packages.  It aims to make linting and testing as simple as possible without requiring per-package configuration.
 
 It works similarly to a Makefile in that "rules" are called to perform actions such as byte-compiling, linting, testing, etc.
 

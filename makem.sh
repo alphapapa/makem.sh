@@ -7,7 +7,7 @@
 
 # * Commentary:
 
-# makem.sh is a script helps to build, lint, and test Emacs Lisp
+# makem.sh is a script that helps to build, lint, and test Emacs Lisp
 # packages.  It aims to make linting and testing as simple as possible
 # without requiring per-package configuration.
 
