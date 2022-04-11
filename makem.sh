@@ -555,6 +555,8 @@ function sandbox {
     args_sandbox=(
         --title "makem.sh: $(basename $(pwd)) (sandbox: $sandbox_dir)"
         --eval "(setq user-emacs-directory (file-truename \"$sandbox_dir\"))"
+        --load package
+        --eval "(setq package-user-dir (expand-file-name \"elpa\" user-emacs-directory))"
         --eval "(setq user-init-file (file-truename \"$init_file\"))"
     )
 

@@ -237,6 +237,9 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 *Added*
 +  ~lint-elint~ rule (not enabled by default in ~lint~ rule due to Elint's output not seeming very useful).
 
+*Fixed*
++  Set ~package-user-dir~ (needed for Emacs 28 compatibility).
+
 ** 0.5
 
 *Changed*
