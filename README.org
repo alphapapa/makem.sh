@@ -22,6 +22,7 @@ The script can run Emacs with the developer's local Emacs configuration, or with
 - [[#installation][Installation]]
 - [[#usage][Usage]]
   - [[#makemsh-script][makem.sh script]]
+  - [[#transient-menu-makemel][Transient menu (makem.el)]]
   - [[#makefile][Makefile]]
   - [[#github-action][GitHub Action]]
   - [[#github-linguist-statistics][GitHub Linguist statistics]]
@@ -70,10 +71,11 @@ Copy =makem.sh= into your package's root directory.  Optionally, also copy =Make
 :PROPERTIES:
 :TOC:      :include descendants :depth 1
 :END:
-The =makem.sh= script can be called directly or through a =Makefile=.  Use =makem.sh --help= to list available rules.
+The =makem.sh= script can be called directly or through a =Makefile=.  Use =makem.sh --help= to list available rules.  The Emacs library =makem.el= provides a Transient dispatcher (like Magit) to easily run the script from within Emacs with selected options.
 
 :CONTENTS:
 - [[#makemsh-script][makem.sh script]]
+- [[#transient-menu-makemel][Transient menu (makem.el)]]
 - [[#makefile][Makefile]]
 - [[#github-action][GitHub Action]]
 - [[#github-linguist-statistics][GitHub Linguist statistics]]
@@ -151,6 +153,12 @@ The script may be called directly to specify additional options.
   "Package-Requires" headers in source files, from -pkg.el files, and
   from a Cask file.
 #+END_EXAMPLE
+
+** Transient menu (=makem.el=)
+
+The Elisp file =makem.el= provides a Transient dispatcher (this file should be installed into your Emacs configuration rather than into a project's directory).  Use =M-x makem RET= to show it.
+
+[[images/transient.png]]
 
 ** Makefile
 
@@ -236,6 +244,7 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 
 *Added*
 +  ~lint-elint~ rule (not enabled by default in ~lint~ rule due to Elint's output not seeming very useful).
++  =makem.el= library with Transient dispatcher.
 
 *Fixed*
 +  Set ~package-user-dir~ (needed for Emacs 28 compatibility).
