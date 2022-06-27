@@ -92,6 +92,7 @@
   :class 'transient-option
   :key "-s"
   :argument "--sandbox"
+  :history-key "--sandbox"
   :prompt "Sandbox directory (blank for temporary one): "
   :reader (lambda (prompt initial-input _history)
             (pcase (read-directory-name prompt nil nil 'confirm (or initial-input ".sandbox"))
@@ -105,28 +106,27 @@
   :class 'transient-option
   :key "--"
   :argument "--"
-  :prompt "Emacs arguments: "
-  :reader (lambda (prompt initial-input history)
-            (concat " " (read-string prompt initial-input history))))
+  :multi-value 'rest
+  :prompt "Emacs arguments (separated by commas): ")
 
 (transient-define-argument makem:-v ()
+  ;; FIXME: When the transient's values are saved and this option is
+  ;; unset, it gets set to the "-E" option's value when the transient
+  ;; is called.  I don't understand why, and no combination of slot
+  ;; options I've tried has fixed it.
   :description "Verbosity"
   :class 'transient-option
   :key "-v"
   :argument "-"
-  :prompt "Verbosity level (up to 3): "
-  :reader (lambda (prompt initial-input history)
-            (let ((level (read-number prompt initial-input history)))
-              (if (< 0 level 4)
-                  (make-string level ?v)
-                (message "Verbosity level must be from 1-3")
-                ""))))
+  :prompt "Verbosity level: "
+  :choices '("v" "vv" "vvv"))
 
 (transient-define-argument makem:-e ()
   :description "Exclude files"
   :class 'transient-option
   :key "-e"
   :argument "--exclude="
+  :history-key "--exclude"
   :prompt "Exclude files: "
   :reader (lambda (prompt initial-input history)
             (let ((files (mapcar #'file-relative-name
@@ -139,6 +139,7 @@
   :class 'transient-option
   :key "-f"
   :argument "--file="
+  :history-key "--file"
   :prompt "Include files: "
   :reader (lambda (prompt initial-input history)
             (let ((files (mapcar #'file-relative-name
