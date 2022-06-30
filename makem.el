@@ -162,17 +162,9 @@
   "Return non-nil if \"makem.sh\" exists, or offer to download it."
   (or (file-exists-p "makem.sh")
       (when (yes-or-no-p "File \"makem.sh\" not present in current directory.  Download it? ")
-        (when-let
-            (buffer (url-retrieve-synchronously "https://raw.githubusercontent.com/alphapapa/makem.sh/master/makem.sh"))
-          (with-current-buffer buffer
-            ;; Why doesn't Emacs have a function to download a file yet?
-            (unless (re-search-forward "\r?\n\r?\n")
-              (error "End of HTTP headers not found"))
-            (narrow-to-region (point) (point-max)))
-          (let ((coding-system-for-write 'no-conversion))
-            (with-temp-file "makem.sh"
-              (insert-buffer-substring buffer)))
-          (chmod "makem.sh" 493))
+        (url-copy-file "https://raw.githubusercontent.com/alphapapa/makem.sh/master/makem.sh"
+                       "makem.sh")
+        (chmod "makem.sh" 493)
         t)))
 
 (provide 'makem)
