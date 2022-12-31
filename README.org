@@ -249,6 +249,7 @@ It's often helpful to run tests automatically before pushing with git.  Here's a
 *Fixed*
 +  Set ~package-user-dir~ (needed for Emacs 28 compatibility).
 +  Rule ~lint-indent~ for Emacs 28.
++  Install Ispell in CI for ~checkdoc~ linting.
 
 ** 0.5
 
