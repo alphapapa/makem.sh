@@ -2,6 +2,30 @@
 
 * Checklists
 
+** Release template
+
++  [X] Update version numbers
+     -  [X] =makem.sh=
+     -  [X] =Makefile=
+     -  [X] =test.yml=
+     -  [X] =README.org=
++  [ ] Tag and sign release
++  [ ] Push
+
+** DONE Release 0.4.2
+CLOSED: [2020-12-02 Wed 14:20]
+:LOGBOOK:
+-  State "DONE"       from              [2020-12-19 Sat 07:33]
+:END:
+
++  [X] Update version numbers
+     -  [X] =makem.sh=
+     -  [X] =Makefile=
+     -  [X] =test.yml=
+     -  [X] =README.org=
++  [X] Tag and sign release
++  [X] Push
+
 ** DONE Release 0.4.1
 CLOSED: [2020-12-01 Tue 16:39]
 :LOGBOOK:
