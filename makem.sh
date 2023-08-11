@@ -177,6 +177,7 @@ function elisp-checkdoc-file {
               (setq makem-checkdoc-errors-p t)
               ;; Return nil because we *are* generating a buffered list of errors.
               nil))))
+    (put 'ispell-buffer-session-localwords 'safe-local-variable #'list-of-strings-p)
     (mapcar #'checkdoc-file files)
     (when makem-checkdoc-errors-p
       (kill-emacs 1))))
