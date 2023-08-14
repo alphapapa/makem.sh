@@ -386,6 +386,10 @@ function byte-compile-file {
 
 # ** Files
 
+function files-project {
+    git ls-files $(git rev-parse --show-toplevel)
+}
+
 function dirs-project {
     # Echo list of directories to be used in load path.
     files-project-feature | dirnames
@@ -394,8 +398,8 @@ function dirs-project {
 
 function files-project-elisp {
     # Echo list of Elisp files in project.
-    git ls-files 2>/dev/null \
-        | grep -E "\.el$" \
+    files-project 2>/dev/null \
+        | egrep "\.el$" \
         | filter-files-exclude-default \
         | filter-files-exclude-args
 }
@@ -496,7 +500,7 @@ function ert-tests-p {
 
 function package-main-file {
     # Echo the package's main file.
-    file_pkg=$(git ls-files ./*-pkg.el 2>/dev/null)
+    file_pkg=$(files-project | grep -- -pkg.el 2>/dev/null)
 
     if [[ $file_pkg ]]
     then
@@ -533,9 +537,9 @@ function dependencies {
     fi
 
     # Search -pkg.el file.
-    if [[ $(git ls-files ./*-pkg.el 2>/dev/null) ]]
+    if [[ $(files-project | grep -- -pkg.el 2>/dev/null) ]]
     then
-        sed -nr 's/.*\(([-[:alnum:]]+)[[:blank:]]+"[.[:digit:]]+"\).*/\1/p' $(git ls-files ./*-pkg.el 2>/dev/null)
+        sed -nr 's/.*\(([-[:alnum:]]+)[[:blank:]]+"[.[:digit:]]+"\).*/\1/p' $(files-project- -- -pkg.el 2>/dev/null)
     fi
 }
 
