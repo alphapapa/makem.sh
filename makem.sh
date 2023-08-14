@@ -112,6 +112,12 @@ Source files are automatically discovered from git, or may be
 specified with options.  Package dependencies are discovered from
 "Package-Requires" headers in source files, from -pkg.el files, and
 from a Cask file.
+
+Checkdoc's spell checker may not recognize some words, causing the
+`lint-checkdoc' rule to fail.  Custom words can be added in file-local
+or directory-local variables using the variable
+`ispell-buffer-session-localwords', which should be set to a list of
+strings.
 EOF
 }
 
