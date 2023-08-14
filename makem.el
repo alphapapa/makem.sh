@@ -4,7 +4,7 @@
 
 ;; Author: Adam Porter <adam@alphapapa.net>
 ;; URL: https://github.com/alphapapa/makem.sh
-;; Requires: ((emacs "27.1") (transient "0.3.7"))
+;; Requires: ((emacs "27.1") (transient "0.3.7") (project "0.9.8"))
 ;; Version: 0.7-pre
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -32,6 +32,7 @@
 
 (require 'cl-lib)
 (require 'transient)
+(require 'project)
 
 ;;;; Transient
 
@@ -152,23 +153,51 @@
 (defun makem-run (rule)
   "Run \"makem.sh\" with RULE and Transient arguments."
   (unless (makem-ensure-script)
-    ;; TODO: Check for path in dir-local variable, then look in
-    ;; current directory, then project root, then check for a makem.sh
-    ;; submodule.
-    (user-error "File \"makem.sh\" not present in %s" default-directory))
-  (let ((command (concat "./makem.sh "
+    (user-error "\"makem.sh\" command not found"))
+  (let ((command (concat (makem-script-path) " "
                          (mapconcat #'shell-quote-argument (transient-args 'makem) " ")
                          " " rule)))
     (compile command)))
 
 (defun makem-ensure-script ()
   "Return non-nil if \"makem.sh\" exists, or offer to download it."
-  (or (file-exists-p "makem.sh")
+  (or (file-exists-p (makem-script-path))
       (when (yes-or-no-p "File \"makem.sh\" not present in current directory.  Download it? ")
         (url-copy-file "https://raw.githubusercontent.com/alphapapa/makem.sh/master/makem.sh"
                        "makem.sh")
         (chmod "makem.sh" 493)
         t)))
+
+(defun makem-script-path ()
+  "Return path of makem.sh script.
+In order, check:
+
+- value of `makem-script-path' in dir-local variable matching an executable file
+- executable file named \"makem.sh\" in current directory
+- executable file named \"makem.sh\" in project root directory
+- makem.sh git submodule
+- makem.sh command in `exec-path'
+
+If none are found, return nil."
+  (cl-flet ((executable-path
+              (path)
+              (when (and path (file-executable-p path))
+                path)))
+    (hack-dir-local-variables)
+    (or (executable-path
+         (alist-get 'makem-script-path dir-local-variables-alist))
+        (executable-path (expand-file-name "makem.sh"))
+        (executable-path
+         (expand-file-name "makem.sh" (project-root (project-current))))
+        (executable-path
+         (let ((gitmodules-files (expand-file-name ".gitmodules" (project-root (project-current)))))
+           (when (file-exists-p gitmodules-files)
+             (with-temp-buffer
+               (insert-file-contents gitmodules-files)
+               (goto-char (point-min))
+               (when (re-search-forward "\\[submodule \"makem.sh\"\\]\n[ \t]*path *= *\\(.+\\)" nil t)
+                 (expand-file-name "makem.sh" (match-string 1)))))))
+        (executable-find "makem.sh"))))
 
 (provide 'makem)
 
