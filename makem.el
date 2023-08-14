@@ -152,6 +152,9 @@
 (defun makem-run (rule)
   "Run \"makem.sh\" with RULE and Transient arguments."
   (unless (makem-ensure-script)
+    ;; TODO: Check for path in dir-local variable, then look in
+    ;; current directory, then project root, then check for a makem.sh
+    ;; submodule.
     (user-error "File \"makem.sh\" not present in %s" default-directory))
   (let ((command (concat "./makem.sh "
                          (mapconcat #'shell-quote-argument (transient-args 'makem) " ")
