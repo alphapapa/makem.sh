@@ -389,10 +389,7 @@ function byte-compile-file {
 function submodules {
     # Echo a list of submodules's paths relative to the repo root.
     # TODO: Parse with bash regexp instead of cut.
-    (
-        cd $(project-root)
-        git submodule status | awk '{print $2}'
-    )
+    git submodule status | awk '{print $2}'
 }
 
 function project-root {
@@ -407,22 +404,16 @@ function project-root {
 
 function files-project {
     # Return a list of files in project; or with $1, files in it
-    # matching that pattern.
-    [[ $1 ]] && file="/$1" || file="."
+    # matching that pattern.  Excludes submodules.
+    [[ $1 ]] && pattern="/$1" || pattern="."
 
-    local submodules excludes
-    submodules=$(submodules)
-    if [[ $submodules ]]
-    then
-        for submodule in "$submodules"
-        do
-            excludes+=(":!:$submodule")
-        done
-    fi
-    (
-        cd $(project-root)
-        git ls-files -- "$file" "${excludes[@]}"
-    )
+    local excludes
+    for submodule in $(submodules)
+    do
+        excludes+=(":!:$submodule")
+    done
+
+    git ls-files -- "$pattern" "${excludes[@]}"
 }
 
 function dirs-project {
@@ -1238,6 +1229,9 @@ paths_temp+=("$package_initialize_file")
 # * Main
 
 trap cleanup EXIT INT TERM
+
+# Change to project root directory first.
+cd "$(project-root)"
 
 # Discover project files.
 files_project_feature=($(files-project-feature))
