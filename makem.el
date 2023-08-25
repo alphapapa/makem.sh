@@ -168,34 +168,37 @@
         (chmod "makem.sh" 493)
         t)))
 
-(defun makem-script-path ()
-  "Return path of makem.sh script.
+(defun makem-script-file-name ()
+  "Return file name of ~makem.sh script.
 In order, check:
 
-- value of `makem-script-path' in dir-local variable matching an executable file
+- value of `makem-script-file-name' in dir-local variable matching an executable file
 - executable file named \"makem.sh\" in current directory
 - executable file named \"makem.sh\" in project root directory
 - makem.sh git submodule
 - makem.sh command in `exec-path'
 
 If none are found, return nil."
-  (cl-flet ((executable-path
-              (path)
-              (when (and path (file-executable-p path))
-                path)))
+  (cl-flet ((valid-script-name (name)
+              (when (and name (file-executable-p name))
+                name)))
+    ;; TODO: Determine whether we need to call `hack-dir-local-variables' here.
     (hack-dir-local-variables)
-    (or (executable-path
-         (alist-get 'makem-script-path dir-local-variables-alist))
-        (executable-path (expand-file-name "makem.sh"))
-        (executable-path
-         (expand-file-name "makem.sh" (project-root (project-current))))
-        (executable-path
+    (or (valid-script-name (alist-get 'makem-script-file-name dir-local-variables-alist))
+        (valid-script-name (expand-file-name "makem.sh"))
+        (valid-script-name (expand-file-name "makem.sh" (project-root (project-current))))
+        (valid-script-name
+         ;; TODO: If possible, find another way to do this other than parsing the .gitmodules file.
          (let ((gitmodules-files (expand-file-name ".gitmodules" (project-root (project-current)))))
            (when (file-exists-p gitmodules-files)
              (with-temp-buffer
                (insert-file-contents gitmodules-files)
                (goto-char (point-min))
-               (when (re-search-forward "\\[submodule \"makem.sh\"\\]\n[ \t]*path *= *\\(.+\\)" nil t)
+               (when (re-search-forward (rx seq "[submodule \"makem" nonl "sh\"]\n"
+                                            (zero-or-more (any "	 "))
+                                            "name" (zero-or-more " ") "=" (zero-or-more " ")
+                                            (group (one-or-more nonl)))
+                                        nil t)
                  (expand-file-name "makem.sh" (match-string 1)))))))
         (executable-find "makem.sh"))))
 
