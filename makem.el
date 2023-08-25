@@ -194,9 +194,8 @@ If none are found, return nil."
              (with-temp-buffer
                (insert-file-contents gitmodules-files)
                (goto-char (point-min))
-               (when (re-search-forward (rx seq "[submodule \"makem" nonl "sh\"]\n"
-                                            (zero-or-more (any "	 "))
-                                            "name" (zero-or-more " ") "=" (zero-or-more " ")
+               (when (re-search-forward (rx "[submodule \"makem" nonl "sh\"]\n"
+                                            (0+ blank) "name" (0+ blank) "=" (0+ blank)
                                             (group (one-or-more nonl)))
                                         nil t)
                  (expand-file-name "makem.sh" (match-string 1)))))))
