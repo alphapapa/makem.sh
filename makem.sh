@@ -387,7 +387,17 @@ function byte-compile-file {
 # ** Files
 
 function files-project {
-    git ls-files $(git rev-parse --show-toplevel)
+    # Return a list of files in project; or with $1, files in it
+    # matching that pattern.
+    [[ $1 ]] && file="/$1"
+
+    # Check for superproject (if script is in a submodule), then repo
+    # root.
+    root_dir=$(git rev-parse --show-superproject-working-tree)
+    [[ $root_dir ]] || root_dir=$(git rev-parse --show-toplevel)
+    [[ $root_dir ]] || error "Can't find repo root."
+
+    git ls-files "$root_dir$file"
 }
 
 function dirs-project {
@@ -500,7 +510,7 @@ function ert-tests-p {
 
 function package-main-file {
     # Echo the package's main file.
-    file_pkg=$(files-project | grep -- -pkg.el 2>/dev/null)
+    file_pkg=$(files-project "*-pkg.el" 2>/dev/null)
 
     if [[ $file_pkg ]]
     then
@@ -537,7 +547,7 @@ function dependencies {
     fi
 
     # Search -pkg.el file.
-    if [[ $(files-project | grep -- -pkg.el 2>/dev/null) ]]
+    if [[ $(files-project "*-pkg.el" 2>/dev/null) ]]
     then
         sed -nr 's/.*\(([-[:alnum:]]+)[[:blank:]]+"[.[:digit:]]+"\).*/\1/p' $(files-project- -- -pkg.el 2>/dev/null)
     fi
