@@ -180,7 +180,9 @@ In order, check:
 
 If none are found, return nil."
   (cl-flet ((valid-script-name (name)
-              (when (and name (file-executable-p name))
+              (when (and name
+                         (not (file-directory-p name))
+                         (file-executable-p name))
                 name)))
     ;; TODO: Determine whether we need to call `hack-dir-local-variables' here.
     (hack-dir-local-variables)
