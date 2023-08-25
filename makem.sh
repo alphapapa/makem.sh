@@ -386,18 +386,43 @@ function byte-compile-file {
 
 # ** Files
 
-function files-project {
-    # Return a list of files in project; or with $1, files in it
-    # matching that pattern.
-    [[ $1 ]] && file="/$1"
+function submodules {
+    # Echo a list of submodules's paths relative to the repo root.
+    # TODO: Parse with bash regexp instead of cut.
+    (
+        cd $(project-root)
+        git submodule status | awk '{print $2}'
+    )
+}
 
-    # Check for superproject (if script is in a submodule), then repo
-    # root.
+function project-root {
+    # Echo the root of the project (or superproject, if running from
+    # within a submodule).
     root_dir=$(git rev-parse --show-superproject-working-tree)
     [[ $root_dir ]] || root_dir=$(git rev-parse --show-toplevel)
     [[ $root_dir ]] || error "Can't find repo root."
 
-    git ls-files "$root_dir$file"
+    echo "$root_dir"
+}
+
+function files-project {
+    # Return a list of files in project; or with $1, files in it
+    # matching that pattern.
+    [[ $1 ]] && file="/$1" || file="."
+
+    local submodules excludes
+    submodules=$(submodules)
+    if [[ $submodules ]]
+    then
+        for submodule in "$submodules"
+        do
+            excludes+=(":!:$submodule")
+        done
+    fi
+    (
+        cd $(project-root)
+        git ls-files -- "$file" "${excludes[@]}"
+    )
 }
 
 function dirs-project {
