@@ -169,7 +169,7 @@
         t)))
 
 (defun makem-script-file-name ()
-  "Return file name of ~makem.sh script.
+  "Return file name of makem.sh script.
 In order, check:
 
 - value of `makem-script-file-name' in dir-local variable matching an executable file
