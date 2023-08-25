@@ -154,7 +154,7 @@
   "Run \"makem.sh\" with RULE and Transient arguments."
   (unless (makem-ensure-script)
     (user-error "\"makem.sh\" command not found"))
-  (let ((command (concat (makem-script-path) " "
+  (let ((command (concat (makem-script-file-name) " "
                          (mapconcat #'shell-quote-argument (transient-args 'makem) " ")
                          " " rule)))
     (compile command)))
@@ -196,8 +196,8 @@ If none are found, return nil."
              (with-temp-buffer
                (insert-file-contents gitmodules-files)
                (goto-char (point-min))
-               (when (re-search-forward (rx "[submodule \"makem" nonl "sh\"]\n"
-                                            (0+ blank) "name" (0+ blank) "=" (0+ blank)
+               (when (re-search-forward (rx "[submodule" (1+ blank) "\"makem" (optional ".sh") "\"]" "\n"
+                                            (0+ blank) "path" (0+ blank) "=" (0+ blank)
                                             (group (one-or-more nonl)))
                                         nil t)
                  (expand-file-name "makem.sh" (match-string 1)))))))
