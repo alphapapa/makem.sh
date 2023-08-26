@@ -262,6 +262,9 @@ Checkdoc's spell checker may not recognize some words, causing the ~lint-checkdo
 +  Rule ~lint-indent~ for Emacs 28.
 +  Install Ispell in CI for ~checkdoc~ linting.
 
+*Internal*
++ Use ~grep -E~ instead of ~egrep~.  ([[https://github.com/alphapapa/makem.sh/pull/38][#38]].  Thanks to [[https://github.com/jameschensmith][James Chen-Smith]].)
+
 ** 0.5
 
 *Changed*
