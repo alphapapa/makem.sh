@@ -21,12 +21,6 @@ The script can run Emacs with the developer's local Emacs configuration, or with
 :CONTENTS:
 - [[#installation][Installation]]
 - [[#usage][Usage]]
-  - [[#makemsh-script][makem.sh script]]
-  - [[#transient-menu-makemel][Transient menu (makem.el)]]
-  - [[#makefile][Makefile]]
-  - [[#github-action][GitHub Action]]
-  - [[#github-linguist-statistics][GitHub Linguist statistics]]
-  - [[#git-pre-push-hook][git pre-push hook]]
 - [[#changelog][Changelog]]
 - [[#comparisons][Comparisons]]
 :END:
@@ -69,7 +63,7 @@ Copy =makem.sh= into your package's root directory.  Optionally, also copy =Make
 
 * Usage
 :PROPERTIES:
-:TOC:      :include descendants :depth 1
+:TOC:      :include descendants
 :END:
 The =makem.sh= script can be called directly or through a =Makefile=.  Use =makem.sh --help= to list available rules.  The Emacs library =makem.el= provides a Transient dispatcher (like Magit) to easily run the script from within Emacs with selected options.
 
@@ -80,6 +74,7 @@ The =makem.sh= script can be called directly or through a =Makefile=.  Use =make
 - [[#github-action][GitHub Action]]
 - [[#github-linguist-statistics][GitHub Linguist statistics]]
 - [[#git-pre-push-hook][git pre-push hook]]
+- [[#spell-checking][Spell checking]]
 :END:
 
 ** =makem.sh= script
