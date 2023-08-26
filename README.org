@@ -245,7 +245,7 @@ Checkdoc's spell checker may not recognize some words, causing the ~lint-checkdo
 :TOC:      :ignore children
 :END:
 
-** 0.6-pre
+** 0.6
 
 *Added*
 +  ~lint-elint~ rule (not enabled by default in ~lint~ rule due to Elint's output not seeming very useful).
