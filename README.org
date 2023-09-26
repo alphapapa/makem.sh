@@ -247,7 +247,12 @@ Checkdoc's spell checker may not recognize some words, causing the ~lint-checkdo
 
 ** 0.7-pre
 
-Nothing new yet.
+*Added*
++ Script ~makem.sh~ can now be run from a subdirectory (rather than having to be in the project's root directory).  This also enables it to be used as a git submodule.
++ Commands in library ~makem.el~ locate the shell script automatically in the project's directories and submodules.
+
+*Credits*
++ Thanks to [[https://ushin.org/][ushin]] for contributing the subdirectory/submodule-related changes.
 
 ** 0.6
 
@@ -255,6 +260,7 @@ Nothing new yet.
 +  ~lint-elint~ rule (not enabled by default in ~lint~ rule due to Elint's output not seeming very useful).
 +  =makem.el= library with Transient dispatcher.
 +  Custom words for spell checking may be set in a file- or directory-local variable, ~ispell-buffer-session-localwords~.  (Thanks to [[https://github.com/josephmturner][Joseph Turner]].)
++  Allow running ~makem.sh~ from subdirectories within a project, as well as from a Git submodule.  (Thanks to [[https://github.com/josephmturner][Joseph Turner]].)
 
 *Fixed*
 +  Set ~package-user-dir~ (needed for Emacs 28 compatibility).

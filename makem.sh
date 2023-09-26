@@ -386,6 +386,36 @@ function byte-compile-file {
 
 # ** Files
 
+function submodules {
+    # Echo a list of submodules's paths relative to the repo root.
+    # TODO: Parse with bash regexp instead of cut.
+    git submodule status | awk '{print $2}'
+}
+
+function project-root {
+    # Echo the root of the project (or superproject, if running from
+    # within a submodule).
+    root_dir=$(git rev-parse --show-superproject-working-tree)
+    [[ $root_dir ]] || root_dir=$(git rev-parse --show-toplevel)
+    [[ $root_dir ]] || error "Can't find repo root."
+
+    echo "$root_dir"
+}
+
+function files-project {
+    # Return a list of files in project; or with $1, files in it
+    # matching that pattern.  Excludes submodules.
+    [[ $1 ]] && pattern="/$1" || pattern="."
+
+    local excludes
+    for submodule in $(submodules)
+    do
+        excludes+=(":!:$submodule")
+    done
+
+    git ls-files -- "$pattern" "${excludes[@]}"
+}
+
 function dirs-project {
     # Echo list of directories to be used in load path.
     files-project-feature | dirnames
@@ -394,8 +424,8 @@ function dirs-project {
 
 function files-project-elisp {
     # Echo list of Elisp files in project.
-    git ls-files 2>/dev/null \
-        | grep -E "\.el$" \
+    files-project 2>/dev/null \
+        | egrep "\.el$" \
         | filter-files-exclude-default \
         | filter-files-exclude-args
 }
@@ -496,7 +526,7 @@ function ert-tests-p {
 
 function package-main-file {
     # Echo the package's main file.
-    file_pkg=$(git ls-files ./*-pkg.el 2>/dev/null)
+    file_pkg=$(files-project "*-pkg.el" 2>/dev/null)
 
     if [[ $file_pkg ]]
     then
@@ -533,9 +563,9 @@ function dependencies {
     fi
 
     # Search -pkg.el file.
-    if [[ $(git ls-files ./*-pkg.el 2>/dev/null) ]]
+    if [[ $(files-project "*-pkg.el" 2>/dev/null) ]]
     then
-        sed -nr 's/.*\(([-[:alnum:]]+)[[:blank:]]+"[.[:digit:]]+"\).*/\1/p' $(git ls-files ./*-pkg.el 2>/dev/null)
+        sed -nr 's/.*\(([-[:alnum:]]+)[[:blank:]]+"[.[:digit:]]+"\).*/\1/p' $(files-project- -- -pkg.el 2>/dev/null)
     fi
 }
 
@@ -1199,6 +1229,9 @@ paths_temp+=("$package_initialize_file")
 # * Main
 
 trap cleanup EXIT INT TERM
+
+# Change to project root directory first.
+cd "$(project-root)"
 
 # Discover project files.
 files_project_feature=($(files-project-feature))
