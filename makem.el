@@ -154,7 +154,7 @@
   "Run \"makem.sh\" with RULE and Transient arguments."
   (unless (makem-ensure-script)
     (user-error "\"makem.sh\" command not found"))
-  (let ((command (concat (makem-script-file-name) " "
+  (let ((command (concat (makem-script-path) " "
                          (mapconcat #'shell-quote-argument (transient-args 'makem) " ")
                          " " rule)))
     (compile command)))
@@ -168,11 +168,11 @@
         (chmod "makem.sh" 493)
         t)))
 
-(defun makem-script-file-name ()
+(defun makem-script-path ()
   "Return file name of makem.sh script.
 In order, check:
 
-- value of `makem-script-file-name' in dir-local variable matching an executable file
+- value of `makem-script-path' in dir-local variable matching an executable file
 - executable file named \"makem.sh\" in current directory
 - executable file named \"makem.sh\" in project root directory
 - makem.sh git submodule
@@ -186,7 +186,7 @@ If none are found, return nil."
                 name)))
     ;; TODO: Determine whether we need to call `hack-dir-local-variables' here.
     (hack-dir-local-variables)
-    (or (valid-script-name (alist-get 'makem-script-file-name dir-local-variables-alist))
+    (or (valid-script-name (alist-get 'makem-script-path dir-local-variables-alist))
         (valid-script-name (expand-file-name "makem.sh"))
         (valid-script-name (expand-file-name "makem.sh" (project-root (project-current))))
         (valid-script-name
