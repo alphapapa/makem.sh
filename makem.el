@@ -38,7 +38,7 @@
 
 ;; FIXME: Some of the infixes seem to incorrectly share whole-transient history.
 
-;;;###autoload
+;;;###autoload (autoload 'makem "makem" nil t)
 (transient-define-prefix makem ()
   "Transient for running makem.sh."
   [:pad-keys t
