@@ -403,8 +403,8 @@ function project-root {
 }
 
 function files-project {
-    # Return a list of files in project; or with $1, files in it
-    # matching that pattern.  Excludes submodules.
+    # Echo a list of files in project; or with $1, files in it
+    # matching that pattern with "git ls-files".  Excludes submodules.
     [[ $1 ]] && pattern="/$1" || pattern="."
 
     local excludes
