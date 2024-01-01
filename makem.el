@@ -161,7 +161,7 @@
 
 (defun makem-ensure-script ()
   "Return non-nil if \"makem.sh\" exists, or offer to download it."
-  (or (file-exists-p (makem-script-path))
+  (or (makem-script-path)
       (when (yes-or-no-p "File \"makem.sh\" not present in current directory.  Download it? ")
         (url-copy-file "https://raw.githubusercontent.com/alphapapa/makem.sh/master/makem.sh"
                        "makem.sh")
