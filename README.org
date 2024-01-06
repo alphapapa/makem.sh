@@ -252,6 +252,9 @@ Checkdoc's spell checker may not recognize some words, causing the ~lint-checkdo
 + Commands in library ~makem.el~ locate the shell script automatically in the project's directories and submodules.
 + Upgrade built-in packages when installing dependencies.  ([[https://github.com/alphapapa/makem.sh/issues/41][#41]].  Thanks to [[https://ushin.org/][USHIN]] for sponsoring this fix.)
 
+*Fixed*
++ File exclusion regular expression.  ([[https://github.com/alphapapa/makem.sh/pull/32][#32]].  Thanks to [[https://github.com/fritzgrabo][Fritz Grabo]].)
+
 *Credits*
 + Thanks to [[https://ushin.org/][ushin]] for contributing the subdirectory/submodule-related changes.
 
