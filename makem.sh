@@ -452,7 +452,7 @@ function dirnames {
 
 function filter-files-exclude-default {
     # Filter out paths (STDIN) which should be excluded by default.
-    grep -E -v "(/\.cask/|-autoloads.el|.dir-locals)"
+    grep -E -v "(/\.cask/|-autoloads\.el|\.dir-locals)"
 }
 
 function filter-files-exclude-args {
