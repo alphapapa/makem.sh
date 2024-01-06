@@ -618,6 +618,9 @@ function sandbox {
         local deps=($(dependencies))
         debug "Installing dependencies: ${deps[@]}"
 
+        # Ensure built-in packages get upgraded to newer versions from ELPA.
+        args_sandbox_package_install+=(--eval "(setq package-install-upgrade-built-in t)")
+
         for package in "${deps[@]}"
         do
             args_sandbox_package_install+=(--eval "(package-install '$package)")

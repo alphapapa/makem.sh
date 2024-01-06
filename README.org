@@ -250,6 +250,7 @@ Checkdoc's spell checker may not recognize some words, causing the ~lint-checkdo
 *Added*
 + Script ~makem.sh~ can now be run from a subdirectory (rather than having to be in the project's root directory).  This also enables it to be used as a git submodule.
 + Commands in library ~makem.el~ locate the shell script automatically in the project's directories and submodules.
++ Upgrade built-in packages when installing dependencies.  ([[https://github.com/alphapapa/makem.sh/issues/41][#41]].  Thanks to [[https://ushin.org/][USHIN]] for sponsoring this fix.)
 
 *Credits*
 + Thanks to [[https://ushin.org/][ushin]] for contributing the subdirectory/submodule-related changes.
