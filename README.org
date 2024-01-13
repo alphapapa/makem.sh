@@ -247,7 +247,8 @@ Checkdoc's spell checker may not recognize some words, causing the ~lint-checkdo
 
 ** 0.7.1-pre
 
-Nothing new yet.
+*Fixes*
++ Don't use obsolete Org ELPA repository (preventing obsolete Org versions from being installed).
 
 ** 0.7
 
