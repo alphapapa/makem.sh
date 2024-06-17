@@ -323,7 +323,6 @@ function run_emacs {
         --eval "(setq load-prefer-newer t)"
         "${args_debug[@]}"
         "${args_sandbox[@]}"
-        -l $package_initialize_file
         $arg_batch
         "${args_load_paths[@]}"
     )
@@ -606,7 +605,6 @@ function sandbox {
     args_sandbox=(
         --title "makem.sh: $(basename $(pwd)) (sandbox: $sandbox_dir)"
         --eval "(setq user-emacs-directory (file-truename \"$sandbox_dir\"))"
-        --load package
         --eval "(setq package-user-dir (expand-file-name \"elpa\" user-emacs-directory))"
         --eval "(setq user-init-file (file-truename \"$init_file\"))"
     )
@@ -645,6 +643,8 @@ function sandbox {
         verbose 1 "Installing packages into sandbox..."
 
         run_emacs \
+            --eval "(setq package-user-dir (expand-file-name \"elpa\" user-emacs-directory))" \
+            -l $package_initialize_file
             --eval "(package-refresh-contents)" \
             "${args_sandbox_package_install[@]}" \
             && success "Packages installed." \
@@ -652,6 +652,13 @@ function sandbox {
     fi
 
     verbose 2 "Sandbox initialized."
+}
+
+function args-load-path-sandbox {
+    for path in $(find "$sandbox_dir/elpa" -maxdepth 1 -type d -not -name "archives" -print | tail -n+2)
+    do
+        printf -- '-L %q ' "$path"
+    done
 }
 
 # ** Utility
@@ -1252,7 +1259,6 @@ fi
 
 # Set load path.
 args_load_paths=($(args-load-path))
-debug "LOAD PATH ARGS: ${args_load_paths[@]}"
 
 # If rules include linters and sandbox-dir is unspecified, install
 # linters automatically.
@@ -1263,7 +1269,12 @@ then
 fi
 
 # Initialize sandbox.
-[[ $sandbox ]] && sandbox
+[[ $sandbox ]] && {
+    sandbox
+    args_load_paths+=($(args-load-path-sandbox))
+}
+
+debug "LOAD PATH ARGS: ${args_load_paths[@]}"
 
 # Run rules.
 for rule in "${rest[@]}"
