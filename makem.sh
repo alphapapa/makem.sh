@@ -218,21 +218,12 @@ function elisp-byte-compile-file {
   "Call \`byte-compile-warn', returning the number of errors and the number of warnings."
   (let ((num-warnings 0)
         (num-errors 0))
-    (cl-letf (((symbol-function 'byte-compile-warn)
-               (lambda (format &rest args)
-                 ;; Copied from \`byte-compile-warn'.
-                 (cl-incf num-warnings)
-                 (setq format (apply #'format-message format args))
-                 (byte-compile-log-warning format t :warning)))
-              ((symbol-function 'byte-compile-report-error)
-               (lambda (error-info &optional fill &rest args)
-                 (cl-incf num-errors)
-                 ;; Copied from \`byte-compile-report-error'.
-                 (setq byte-compiler-error-flag t)
-                 (byte-compile-log-warning
-                  (if (stringp error-info) error-info
-                    (error-message-string error-info))
-                  fill :error))))
+    (let ((byte-compile-log-warning-function
+           (lambda (string position fill level)
+             (pcase-exhaustive level
+               (:warning (cl-incf num-warnings))
+               (:error (cl-incf num-errors)))
+             (byte-compile--log-warning-for-byte-compile string position fill level))))
       (byte-compile-file filename load))
     (list num-errors num-warnings)))
 EOF
