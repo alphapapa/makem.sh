@@ -635,7 +635,7 @@ function sandbox {
 
         run_emacs \
             --eval "(setq package-user-dir (expand-file-name \"elpa\" user-emacs-directory))" \
-            -l $package_initialize_file \
+            -l "$package_initialize_file" \
             --eval "(package-refresh-contents)" \
             "${args_sandbox_package_install[@]}" \
             && success "Packages installed." \
