@@ -646,6 +646,8 @@ function sandbox {
 }
 
 function args-load-path-sandbox {
+    # Echo list of Emacs arguments to add paths of packages installed
+    # in sandbox to load-path.
     if ! [[ -d "$sandbox_dir/elpa" ]]
     then
         warn "Sandbox's \"elpa/\" directory not found: no packages installed."
