@@ -646,10 +646,16 @@ function sandbox {
 }
 
 function args-load-path-sandbox {
-    for path in $(find "$sandbox_dir/elpa" -maxdepth 1 -type d -not -name "archives" -print | tail -n+2)
-    do
-        printf -- '-L %q ' "$path"
-    done
+    if ! [[ -d "$sandbox_dir/elpa" ]]
+    then
+        warn "Sandbox's \"elpa/\" directory not found: no packages installed."
+    else
+        for path in $(find "$sandbox_dir/elpa" -maxdepth 1 -type d -not -name "archives" -print \
+                          | tail -n+2)
+        do
+            printf -- '-L %q ' "$path"
+        done
+    fi
 }
 
 # ** Utility
@@ -751,6 +757,10 @@ function error {
 function die {
     [[ $@ ]] && error "$@"
     exit $errors
+}
+function warn {
+    echo_color yellow "WARNING ($(ts)): $@" >&2
+    ((warnings++))
 }
 function log {
     echo "LOG ($(ts)): $@" >&2
@@ -1072,6 +1082,8 @@ test_files_regexp='^((tests?|t)/)|-tests?.el$|^test-'
 
 emacs_command=("emacs")
 errors=0
+# TODO: Do something with number of warnings?
+warnings=0
 verbose=0
 compile=true
 arg_batch="--batch"
