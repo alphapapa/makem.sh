@@ -218,21 +218,12 @@ function elisp-byte-compile-file {
   "Call \`byte-compile-warn', returning the number of errors and the number of warnings."
   (let ((num-warnings 0)
         (num-errors 0))
-    (cl-letf (((symbol-function 'byte-compile-warn)
-               (lambda (format &rest args)
-                 ;; Copied from \`byte-compile-warn'.
-                 (cl-incf num-warnings)
-                 (setq format (apply #'format-message format args))
-                 (byte-compile-log-warning format t :warning)))
-              ((symbol-function 'byte-compile-report-error)
-               (lambda (error-info &optional fill &rest args)
-                 (cl-incf num-errors)
-                 ;; Copied from \`byte-compile-report-error'.
-                 (setq byte-compiler-error-flag t)
-                 (byte-compile-log-warning
-                  (if (stringp error-info) error-info
-                    (error-message-string error-info))
-                  fill :error))))
+    (let ((byte-compile-log-warning-function
+           (lambda (string position fill level)
+             (pcase-exhaustive level
+               (:warning (cl-incf num-warnings))
+               (:error (cl-incf num-errors)))
+             (byte-compile--log-warning-for-byte-compile string position fill level))))
       (byte-compile-file filename load))
     (list num-errors num-warnings)))
 EOF
@@ -323,7 +314,6 @@ function run_emacs {
         --eval "(setq load-prefer-newer t)"
         "${args_debug[@]}"
         "${args_sandbox[@]}"
-        -l $package_initialize_file
         $arg_batch
         "${args_load_paths[@]}"
     )
@@ -606,7 +596,6 @@ function sandbox {
     args_sandbox=(
         --title "makem.sh: $(basename $(pwd)) (sandbox: $sandbox_dir)"
         --eval "(setq user-emacs-directory (file-truename \"$sandbox_dir\"))"
-        --load package
         --eval "(setq package-user-dir (expand-file-name \"elpa\" user-emacs-directory))"
         --eval "(setq user-init-file (file-truename \"$init_file\"))"
     )
@@ -645,6 +634,8 @@ function sandbox {
         verbose 1 "Installing packages into sandbox..."
 
         run_emacs \
+            --eval "(setq package-user-dir (expand-file-name \"elpa\" user-emacs-directory))" \
+            -l "$package_initialize_file" \
             --eval "(package-refresh-contents)" \
             "${args_sandbox_package_install[@]}" \
             && success "Packages installed." \
@@ -652,6 +643,21 @@ function sandbox {
     fi
 
     verbose 2 "Sandbox initialized."
+}
+
+function args-load-path-sandbox {
+    # Echo list of Emacs arguments to add paths of packages installed
+    # in sandbox to load-path.
+    if ! [[ -d "$sandbox_dir/elpa" ]]
+    then
+        warn "Sandbox's \"elpa/\" directory not found: no packages installed."
+    else
+        for path in $(find "$sandbox_dir/elpa" -maxdepth 1 -type d -not -name "archives" -print \
+                          | tail -n+2)
+        do
+            printf -- '-L %q ' "$path"
+        done
+    fi
 }
 
 # ** Utility
@@ -753,6 +759,10 @@ function error {
 function die {
     [[ $@ ]] && error "$@"
     exit $errors
+}
+function warn {
+    echo_color yellow "WARNING ($(ts)): $@" >&2
+    ((warnings++))
 }
 function log {
     echo "LOG ($(ts)): $@" >&2
@@ -1074,6 +1084,8 @@ test_files_regexp='^((tests?|t)/)|-tests?.el$|^test-'
 
 emacs_command=("emacs")
 errors=0
+# TODO: Do something with number of warnings?
+warnings=0
 verbose=0
 compile=true
 arg_batch="--batch"
@@ -1252,7 +1264,6 @@ fi
 
 # Set load path.
 args_load_paths=($(args-load-path))
-debug "LOAD PATH ARGS: ${args_load_paths[@]}"
 
 # If rules include linters and sandbox-dir is unspecified, install
 # linters automatically.
@@ -1263,7 +1274,12 @@ then
 fi
 
 # Initialize sandbox.
-[[ $sandbox ]] && sandbox
+[[ $sandbox ]] && {
+    sandbox
+    args_load_paths+=($(args-load-path-sandbox))
+}
+
+debug "LOAD PATH ARGS: ${args_load_paths[@]}"
 
 # Run rules.
 for rule in "${rest[@]}"

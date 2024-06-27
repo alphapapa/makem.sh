@@ -247,7 +247,8 @@ Checkdoc's spell checker may not recognize some words, causing the ~lint-checkdo
 
 ** 0.8-pre
 
-Nothing new yet.
+*Changes*
++ Don't initialize package system when not necessary.  (Initializing the package system causes some other libraries, like ~url~, to be loaded, which can obscure problems which might occur otherwise.  [[https://github.com/alphapapa/makem.sh/issues/47][#47]].  Thanks to [[https://github.com/josephmturner][Joseph Turner]] for reporting.) 
 
 ** 0.7.1
 
