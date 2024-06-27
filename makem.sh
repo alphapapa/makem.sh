@@ -114,9 +114,9 @@ specified with options.  Package dependencies are discovered from
 from a Cask file.
 
 Checkdoc's spell checker may not recognize some words, causing the
-`lint-checkdoc' rule to fail.  Custom words can be added in file-local
+\`lint-checkdoc' rule to fail.  Custom words can be added in file-local
 or directory-local variables using the variable
-`ispell-buffer-session-localwords', which should be set to a list of
+\`ispell-buffer-session-localwords', which should be set to a list of
 strings.
 EOF
 }
