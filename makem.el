@@ -5,7 +5,7 @@
 ;; Author: Adam Porter <adam@alphapapa.net>
 ;; URL: https://github.com/alphapapa/makem.sh
 ;; Requires: ((emacs "27.1") (transient "0.5.3") (project "0.9.8"))
-;; Version: 0.7.1
+;; Version: 0.8-pre
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

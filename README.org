@@ -245,6 +245,10 @@ Checkdoc's spell checker may not recognize some words, causing the ~lint-checkdo
 :TOC:      :ignore children
 :END:
 
+** 0.8-pre
+
+Nothing new yet.
+
 ** 0.7.1
 
 *Fixes*
