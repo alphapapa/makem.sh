@@ -396,7 +396,7 @@ function files-project {
     # matching that pattern with "git ls-files".  Excludes submodules.
     [[ $1 ]] && pattern="/$1" || pattern="."
 
-    local excludes
+    local excludes=()
     for submodule in $(submodules)
     do
         excludes+=(":!:$submodule")
