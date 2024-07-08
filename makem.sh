@@ -414,7 +414,7 @@ function dirs-project {
 function files-project-elisp {
     # Echo list of Elisp files in project.
     files-project 2>/dev/null \
-        | egrep "\.el$" \
+        | grep -E "\.el$" \
         | filter-files-exclude-default \
         | filter-files-exclude-args
 }
