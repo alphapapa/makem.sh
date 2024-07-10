@@ -396,7 +396,7 @@ function files-project {
     # matching that pattern with "git ls-files".  Excludes submodules.
     [[ $1 ]] && pattern="/$1" || pattern="."
 
-    local excludes
+    local excludes=()
     for submodule in $(submodules)
     do
         excludes+=(":!:$submodule")
@@ -414,7 +414,7 @@ function dirs-project {
 function files-project-elisp {
     # Echo list of Elisp files in project.
     files-project 2>/dev/null \
-        | egrep "\.el$" \
+        | grep -E "\.el$" \
         | filter-files-exclude-default \
         | filter-files-exclude-args
 }
