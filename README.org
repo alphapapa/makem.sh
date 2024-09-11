@@ -252,6 +252,7 @@ Checkdoc's spell checker may not recognize some words, causing the ~lint-checkdo
 
 *Fixes*
 + Escape backticks in ~makem.sh~'s ~usage~ function's Bash here-document.  (Thanks to [[https://github.com/snogge][Ola Nilsson]].)
++ Removal of temporary files.
 
 *Compatibility*
 + Restore compatibility with Bash versions earlier than 4.0 (e.g. on Mac OS).  ([[https://github.com/alphapapa/makem.sh/pull/49][#49]].  Thanks to [[https://github.com/bcc32][Aaron Zeng]].)
